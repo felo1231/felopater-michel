@@ -13,7 +13,7 @@ try:
     api_key = st.secrets["GEMINI_API_KEY"]
     ai.configure(api_key=api_key)
     # استخدام الموديل المستقر
-    model = ai.GenerativeModel(model_name='gemini-1.5-flash')
+    model = ai.GenerativeModel(model_name='gemini-2.5-flash')
 except Exception as e:
     st.error("خطأ في إعدادات الاتصال: تأكد من إضافة GEMINI_API_KEY في إعدادات التطبيق.")
     st.stop()
