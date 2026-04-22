@@ -8,16 +8,16 @@ st.set_page_config(page_title="AI Study Assistant", layout="wide")
 st.title('AI Studying Assistant✨')
 
 # --- GEMINI SETUP ---
-# Ensure your API key is active in Google AI Studio
-api_key = "AIzaSyDZs52qYb8DXZ4sA-q3FtfEUO88wgtVaXU"
+# بدلاً من كتابة المفتاح مباشرة، سنطلب من التطبيق أن يقرأه من الخزنة السرية
+GEMINI_API_KEY = "AIzaSyBXI6jmht4nS6z5KcwYerfPlftcMQX8fR0"
+api_key = st.secrets["GEMINI_API_KEY"]
 ai.configure(api_key=api_key)
 
 try:
-    # 'gemini-3-flash' is the standard for 2026,
-    # but 'gemini-1.5-flash' is the fallback for older projects.
-    model = ai.GenerativeModel(model_name='gemini-3-flash-preview')
+    model = ai.GenerativeModel(model_name='gemini-3-flash')
 except Exception as e:
     st.error(f"Model initialization failed: {e}")
+
 
 
 # 3. Making app tabs
