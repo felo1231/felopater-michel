@@ -9,9 +9,13 @@ st.title('AI Studying Assistant✨')
 
 # --- GEMINI SETUP ---
 # بدلاً من كتابة المفتاح مباشرة، سنطلب من التطبيق أن يقرأه من الخزنة السرية
-GEMINI_API_KEY = "AIzaSyBXI6jmht4nS6z5KcwYerfPlftcMQX8fR0"
-api_key = st.secrets["GEMINI_API_KEY"]
-ai.configure(api_key=api_key)
+try:
+    api_key = st.secrets["GEMINI_API_KEY"]
+    ai.configure(api_key=api_key)
+    model = ai.GenerativeModel(model_name='gemini-1.5-flash')
+except Exception as e:
+    st.error(f"خطأ في إعدادات الاتصال: {e}")
+    st.stop() # إيقاف التطبيق إذا فشل الاتصال
 
 # تعريف الموديل
 model = ai.GenerativeModel('gemini-1.5-flash')
