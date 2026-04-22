@@ -14,11 +14,12 @@ api_key = st.secrets["GEMINI_API_KEY"]
 ai.configure(api_key=api_key)
 
 try:
-    # استخدام النسخة المستقرة 'gemini-1.5-flash' بدلاً من 'preview'
+    api_key = st.secrets["GEMINI_API_KEY"]
+    ai.configure(api_key=api_key)
+    # التأكد من كتابة الاسم الصحيح والمستقر للموديل
     model = ai.GenerativeModel(model_name='gemini-1.5-flash')
 except Exception as e:
-    st.error(f"Model initialization failed: {e}")
-
+    st.error(f"Setup Error: {e}")
 
 # 3. Making app tabs
 questions_tab, quizzes_tab, planner_tab = st.tabs(
