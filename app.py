@@ -1,26 +1,24 @@
-# 1. Importing extensions
 import streamlit as st
 import google.generativeai as ai
 import json
-
-model = ai.GenerativeModel(model_name='gemini-1.5-flash')
 
 # --- APP CONFIG & SETUP ---
 st.set_page_config(page_title="AI Study Assistant", layout="wide")
 st.title('AI Studying Assistant✨')
 
 # --- GEMINI SETUP ---
-# بدلاً من كتابة المفتاح مباشرة، سنطلب من التطبيق أن يقرأه من الخزنة السرية
+# الكود التالي يقرأ المفتاح من إعدادات Streamlit Cloud بشكل آمن
 try:
+    # سيقوم Streamlit بجلب المفتاح من الـ Secrets الخاصة به
     api_key = st.secrets["GEMINI_API_KEY"]
     ai.configure(api_key=api_key)
+    # استخدام الموديل المستقر
     model = ai.GenerativeModel(model_name='gemini-1.5-flash')
 except Exception as e:
-    st.error(f"خطأ في إعدادات الاتصال: {e}")
-    st.stop() # إيقاف التطبيق إذا فشل الاتصال
+    st.error("خطأ في إعدادات الاتصال: تأكد من إضافة GEMINI_API_KEY في إعدادات التطبيق.")
+    st.stop()
 
-# تعريف الموديل
-model = ai.GenerativeModel('gemini-1.5-flash')
+# (بقية كود التطبيق الخاص بك كما هو...)
 
 # 3. Making app tabs
 questions_tab, quizzes_tab, planner_tab = st.tabs(
