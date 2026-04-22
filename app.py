@@ -3,6 +3,8 @@ import streamlit as st
 import google.generativeai as ai
 import json
 
+model = ai.GenerativeModel(model_name='gemini-1.5-flash')
+
 # --- APP CONFIG & SETUP ---
 st.set_page_config(page_title="AI Study Assistant", layout="wide")
 st.title('AI Studying Assistant✨')
