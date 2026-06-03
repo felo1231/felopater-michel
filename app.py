@@ -4,6 +4,7 @@ import json
 import smtplib
 from email.mime.text import MIMEText
 import random
+from streamlit_cookies_controller import CookieController
 
 # --- APP CONFIG & SETUP ---
 st.set_page_config(page_title="AI Study Assistant", layout="wide")
@@ -208,57 +209,63 @@ with planner_tab:
 with account_tab:
     st.header("👤 Account Verification")
 
-    # البريد الإلكتروني الرسمي الخاص بك (الراسل الثابت)
     OFFICIAL_EMAIL = "ai.studying.assisstant@gmail.com"
+    
+    # تهيئة متحكم الكوكيز لحفظ تسجيل الدخول في المتصفح
+    controller = CookieController()
 
-    # تهيئة متغيرات الجلسة (Session State) إذا لم تكن موجودة
+    # محاولة جلب الإيميل المحفوظ في الكوكيز (لو كان معلم على تذكرني سابقاً)
+    saved_user = controller.get("remembered_user")
+
+    # تهيئة متغيرات الجلسة (Session State)
     if "logged_in" not in st.session_state:
-        st.session_state.logged_in = False
+        # لو فيه مستخدم محفوظ في الكوكيز، بنسجل دخوله تلقائياً
+        if saved_user:
+            st.session_state.logged_in = True
+            st.session_state.user_email = saved_user
+        else:
+            st.session_state.logged_in = False
+
     if "generated_otp" not in st.session_state:
         st.session_state.generated_otp = None
     if "otp_sent" not in st.session_state:
         st.session_state.otp_sent = False
 
-    # دالة إرسال الإيميل من حسابك الرسمي إلى حساب المستخدم
+    # دالة إرسال الإيميل
     def send_otp_to_user(user_email, otp_code):
         try:
-            # يتم جلب كلمة مرور التطبيق الخاصة بإيميلك الرسمي من الـ Secrets بأمان
             sender_password = st.secrets["SMTP_PASSWORD"]
         except Exception:
             st.error("خطأ: يرجى إعداد SMTP_PASSWORD في الـ Secrets الخاصة بـ Streamlit أولاً.")
             return False
 
-        # تجهيز محتوى الرسالة وتحديد العنوان المطلوب
         email_content = f"مرحباً بك في AI Studying Assistant✨\n\nكود التحقق الخاص بك هو: {otp_code}\n\nتم إرسال هذا الكود بناءً على طلبك لتسجيل الدخول."
         msg = MIMEText(email_content, 'plain', 'utf-8')
-        
-        # جعل عنوان الرسالة واضحاً باسم البريد الرسمي الخاص بك
         msg['Subject'] = f"Verification Code from {OFFICIAL_EMAIL}"
         msg['From'] = OFFICIAL_EMAIL
         msg['To'] = user_email
 
         try:
-            # الاتصال بسيرفر Gmail الآمن لإرسال الرسالة
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
                 server.login(OFFICIAL_EMAIL, sender_password)
                 server.sendmail(OFFICIAL_EMAIL, user_email, msg.as_string())
             return True
         except Exception as e:
-            st.error(f"فشل في إرسال الإيميل: {e}")
+            st.error(f"Failing to send email: {e}")
             return False
 
-    # --- واجهة المستخدم بناءً على حالة تسجيل الدخول ---
+    # --- واجهة المستخدم ---
     if not st.session_state.logged_in:
         st.subheader("تسجيل الدخول عبر البريد الإلكتروني")
         
-        # حقل يدخل فيه المستخدم بريده الإلكتروني الشخصي (الجيميل بتاعه)
         user_email_input = st.text_input("أدخل بريدك الإلكتروني (Gmail):", placeholder="example@gmail.com")
+        
+        # إضافة خيار بقاء تسجيل الدخول (تشيك بوكس)
+        remember_me = st.checkbox("البقاء قيد تسجيل الدخول (تذكرني) 🔐")
 
-        # زر إرسال الكود إلى بريد المستخدم
         if st.button("طلب كود التحقق ✉️"):
             if user_email_input:
                 if "@gmail.com" in user_email_input.lower():
-                    # توليد كود عشوائي من 6 أرقام
                     st.session_state.generated_otp = str(random.randint(100000, 999999))
                     
                     with st.spinner("جاري إرسال كود التحقق إلى بريدك..."):
@@ -270,7 +277,6 @@ with account_tab:
             else:
                 st.warning("برجاء كتابة بريدك الإلكتروني أولاً.")
 
-        # إذا تم إرسال الكود بنجاح، يظهر حقل التأكيد
         if st.session_state.otp_sent:
             st.divider()
             otp_input = st.text_input("أدخل كود التحقق المستلم (OTP):", type="password", placeholder="******")
@@ -279,19 +285,24 @@ with account_tab:
                 if otp_input == st.session_state.generated_otp:
                     st.session_state.logged_in = True
                     st.session_state.user_email = user_email_input
+                    
+                    # إذا اختار تذكرني، نقوم بحفظ إيميله في كوكيز المتصفح لمدة 30 يوم مثلاً
+                    if remember_me:
+                        controller.set("remembered_user", user_email_input)
+                    
                     st.success("تم التحقق وتسجيل الدخول بنجاح! 🎉")
                     st.rerun()
                 else:
                     st.error("كود التحقق غير صحيح، يرجى مراجعة الإيميل والمحاولة مرة أخرى.")
     else:
-        # واجهة المستخدم المفتوحة بعد تسجيل الدخول
         st.success(f"مرحباً بك! الحساب النشط حالياً: **{st.session_state.user_email}**")
         st.info(f"هذا الحساب تم التحقق منه وإرسال بياناته عبر البريد الرسمي: {OFFICIAL_EMAIL}")
         
-        # زر تسجيل الخروج لإعادة تصفير الحالة
         if st.button("تسجيل الخروج 🚪"):
+            # عند تسجيل الخروج، نمسح البيانات من الـ Session ومن كوكيز المتصفح تماماً
             st.session_state.logged_in = False
             st.session_state.generated_otp = None
             st.session_state.otp_sent = False
             st.session_state.user_email = None
+            controller.remove("remembered_user") # حذف الكوكيز
             st.rerun()
