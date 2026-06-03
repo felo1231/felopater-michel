@@ -14,14 +14,21 @@ st.title('AI Studying Assistant✨')
 
 # --- GEMINI SETUP ---
 # --- GEMINI SETUP ---
+# --- GEMINI SETUP ---
 try:
     api_key = st.secrets["GEMINI_API_KEY"]
     ai.configure(api_key=api_key)
-    # 🌟 التعديل هنا: استخدام الموديل الرسمي المدعوم والمستقر
-    model = ai.GenerativeModel(model_name='gemini-1.5-flash')
+    
+    # محاولة تشغيل الموديل المستقر الحديث، وإذا لم يدعمه السيرفر يتراجع للإصدار الاحتياطي تلقائياً
+    try:
+        model = ai.GenerativeModel(model_name='gemini-2.0-flash')
+    except Exception:
+        model = ai.GenerativeModel(model_name='gemini-1.5-flash-latest')
+        
 except Exception as e:
     st.error("خطأ في إعدادات الاتصال: تأكد من إضافة GEMINI_API_KEY في إعدادات التطبيق.")
     st.stop()
+    
 
 # --- AUTHENTICATION & LOGIN CHECK ---
 OFFICIAL_EMAIL = "ai.studying.assisstant@gmail.com"
