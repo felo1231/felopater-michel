@@ -136,9 +136,20 @@ with account_tab:
     st.info(f"البريد الرسمي للمساعد الدراسي: {OFFICIAL_EMAIL}")
     
     if st.button("تسجيل الخروج 🚪"):
+        # 1. تصفير متغيرات الجلسة أولاً
         st.session_state.logged_in = False
         st.session_state.generated_otp = None
         st.session_state.otp_sent = False
         st.session_state.user_email = None
-        controller.remove("remembered_user") # حذف الكوكيز
+        
+        # 2. حذف الكوكيز بأمان بدون حدوث KeyError
+        try:
+            # نتحقق أولاً إذا كان الكوكيز موجوداً في المتصفح قبل حذفه
+            if controller.get("remembered_user"):
+                controller.remove("remembered_user")
+        except Exception:
+            # إذا حدث أي خطأ غير متوقع أثناء الحذف، يتجاهله الكود ويستمر بسلام
+            pass
+            
+        # 3. إعادة تنشيط الصفحة لتطبيق التغييرات فوراً وحظر الدخول
         st.rerun()
