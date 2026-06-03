@@ -6,6 +6,7 @@ from email.mime.text import MIMEText
 import random
 from streamlit_cookies_controller import CookieController
 from email_validator import validate_email, EmailNotValidError
+import typing_extensions as typing
 
 # --- APP CONFIG & SETUP ---
 st.set_page_config(page_title="AI Study Assistant", layout="wide")
@@ -135,17 +136,22 @@ with questions_tab:
                 answer = model.generate_content(prompt)
             st.write(answer.text)
 
+class QuizQuestion(typing.TypedDict):
+    question: str
+    options: list[str]
+    answer: str
+
 # --- 5. QUIZZES TAB WITH GRADE LEVELS ---
 with quizzes_tab:
     st.header("Interactive Quiz 🧠")
 
     col_q1, col_q2 = st.columns(2)
     with col_q1:
-        quiz_subject = st.text_input("Subject:", placeholder="e.g. Algebra or Python")
+        quiz_subject = st.text_input("Subject:", placeholder="e.g. Algebra or Python", key="subject_input_field")
         grade_level = st.selectbox(
             "Select your Grade/Level:",
             options=["Grade 1","Grade 2","Grade 3","Grade 4","Grade 5","Grade 6","Grade 7", "Grade 8", "Grade 9", "High School", "University"],
-            index=7 # تم ضبط المؤشر الافتراضي ليكون على الصف الثامن مباشرة
+            index=7
         )
 
     with col_q2:
@@ -153,48 +159,35 @@ with quizzes_tab:
         difficulty = st.select_slider("Style:", options=["Basic", "mediam", "Challenge"])
 
     # زر توليد الكويز الرئيسي
-    # زر توليد الكويز الرئيسي
     if st.button("Generate My Quiz 📝"):
         if quiz_subject:
             with st.spinner(f'Creating a {grade_level} quiz...'):
-                # تطوير الـ Prompt ليكون صارماً جداً مع الهيكل
                 quiz_prompt = f"""
-                You are a strict quiz generator. Create a {num_q} question multiple-choice quiz about {quiz_subject}.
+                Create a {num_q} question multiple-choice quiz about {quiz_subject}.
                 The difficulty must be strictly for {grade_level} students at a {difficulty} level.
-
-                You MUST return the response ONLY as a raw valid JSON list of objects, without any markdown formatting, without wrapping it in ```json, and without any conversational text.
-                
-                Expected JSON Structure:
-                [
-                  {{
-                    "question": "Write the question text here",
-                    "options": ["Option A", "Option B", "Option C", "Option D"],
-                    "answer": "Write the exact text of the correct option here"
-                  }}
-                ]
                 """
                 try:
-                    # نستخدم هنا إعدادات إجبار الموديل على إخراج JSON فقط لضمان عدم الانهيار
+                    # ميزة إجبارية من جوجل: تحديد شكل المخرجات لتكون قائمة (List) من الكلاس المختار
                     response = model.generate_content(
                         quiz_prompt,
-                        generation_config={"response_mime_type": "application/json"}
+                        generation_config={
+                            "response_mime_type": "application/json",
+                            "response_schema": list[QuizQuestion],
+                        },
                     )
                     
-                    # تنظيف النص الاحتياطي من أي علامات اقتباس برمجية
-                    raw_json = response.text.replace('```json', '').replace('```', '').strip()
-                    
-                    # تحويل النص إلى كائن بايثون (List)
-                    st.session_state.quiz_data = json.loads(raw_json)
+                    # بما أن جوجل التزم بالهيكل، نقوم بتحويله مباشرة بدون أخطاء تنظيف نصي
+                    st.session_state.quiz_data = json.loads(response.text)
                     st.session_state.user_answers = {}
                     st.session_state.quiz_submitted = False
+                    st.success("تم توليد الاختبار بنجاح بنظام القوالب الذكية! 🎉")
                     
-                    st.success("تم توليد الاختبار بنجاح! جاهز للحل بالأسفل 👇")
                 except Exception as e:
-                    # في حال حدث خطأ، يطبع لك تفاصيل الخطأ الحقيقية في الـ terminal لتسهيل معرفة السبب
-                    print(f"Quiz Error Details: {e}")
-                    st.error("حدث خطأ أثناء صياغة الاختبار من الذكاء الاصطناعي. يرجى الضغط على الزر مرة أخرى للتبديل!")
+                    print(f"Detailed Debug Error: {e}")
+                    st.error("الخادم مشغول حالياً، يرجى إعادة الضغط على الزر مرة أخرى.")
         else:
             st.warning("Please enter a subject first!")
+
     # عرض الكويز وتصحيحه
     if "quiz_data" in st.session_state:
         st.divider()
@@ -234,16 +227,12 @@ with quizzes_tab:
 
             if percentage == 100:
                 st.success("### 🏆 Mastermind Status!")
-                st.write("Perfect score! You've completely mastered this topic.")
             elif percentage >= 80:
                 st.success("### 🚀 Outstanding Work!")
-                st.write("You're a natural at this. Just a tiny bit more focus and you'll be at 100%.")
             elif percentage >= 60:
                 st.warning("### 📈 Great Progress!")
-                st.write("You've got the core concepts down! Review the questions you missed.")
             elif percentage >= 40:
                 st.info("### 🧠 Brain Power Building!")
-                st.write("Every mistake is just a learning point. Keep practicing!")
             else:
                 st.error("### 🛡️ Don't Give Up!")
                 st.write("Let's try a 'Basic' level quiz to build your confidence!")
