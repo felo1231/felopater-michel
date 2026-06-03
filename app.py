@@ -153,34 +153,48 @@ with quizzes_tab:
         difficulty = st.select_slider("Style:", options=["Basic", "mediam", "Challenge"])
 
     # زر توليد الكويز الرئيسي
+    # زر توليد الكويز الرئيسي
     if st.button("Generate My Quiz 📝"):
         if quiz_subject:
             with st.spinner(f'Creating a {grade_level} quiz...'):
+                # تطوير الـ Prompt ليكون صارماً جداً مع الهيكل
                 quiz_prompt = f"""
-                Create a {num_q} question multiple-choice quiz about {quiz_subject}.
+                You are a strict quiz generator. Create a {num_q} question multiple-choice quiz about {quiz_subject}.
                 The difficulty must be strictly for {grade_level} students at a {difficulty} level.
 
-                Return the response ONLY as a JSON list of objects.
-                Format:
+                You MUST return the response ONLY as a raw valid JSON list of objects, without any markdown formatting, without wrapping it in ```json, and without any conversational text.
+                
+                Expected JSON Structure:
                 [
                   {{
-                    "question": "text",
-                    "options": ["A", "B", "C", "D"],
-                    "answer": "exact text of correct option"
+                    "question": "Write the question text here",
+                    "options": ["Option A", "Option B", "Option C", "Option D"],
+                    "answer": "Write the exact text of the correct option here"
                   }}
                 ]
                 """
                 try:
-                    response = model.generate_content(quiz_prompt)
+                    # نستخدم هنا إعدادات إجبار الموديل على إخراج JSON فقط لضمان عدم الانهيار
+                    response = model.generate_content(
+                        quiz_prompt,
+                        generation_config={"response_mime_type": "application/json"}
+                    )
+                    
+                    # تنظيف النص الاحتياطي من أي علامات اقتباس برمجية
                     raw_json = response.text.replace('```json', '').replace('```', '').strip()
+                    
+                    # تحويل النص إلى كائن بايثون (List)
                     st.session_state.quiz_data = json.loads(raw_json)
                     st.session_state.user_answers = {}
                     st.session_state.quiz_submitted = False
+                    
+                    st.success("تم توليد الاختبار بنجاح! جاهز للحل بالأسفل 👇")
                 except Exception as e:
-                    st.error("The AI had trouble formatting the quiz. Please try again!")
+                    # في حال حدث خطأ، يطبع لك تفاصيل الخطأ الحقيقية في الـ terminal لتسهيل معرفة السبب
+                    print(f"Quiz Error Details: {e}")
+                    st.error("حدث خطأ أثناء صياغة الاختبار من الذكاء الاصطناعي. يرجى الضغط على الزر مرة أخرى للتبديل!")
         else:
             st.warning("Please enter a subject first!")
-
     # عرض الكويز وتصحيحه
     if "quiz_data" in st.session_state:
         st.divider()
