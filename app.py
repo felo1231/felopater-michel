@@ -270,11 +270,13 @@ with account_tab:
                 if "@gmail.com" in email_to_check:
                     try:
                         with st.spinner("جاري التحقق من وجود الحساب وإرسال الكود..."):
-                            # الطريقة الثانية: فحص وجود صندوق البريد وسيرفر الجيميل حقيقةً على الإنترنت
+                            # الفحص بمخاطبة السيرفر
                             email_info = validate_email(email_to_check, check_deliverability=True)
-                            user_email_clean = email_info.deliverable # الإيميل بعد تنظيفه والتأكد منه
                             
-                            # إذا مر الفحص بنجاح، نولد الكود ونرسله
+                            # التعديل الصحيح هنا باستخدام .email بدلاً من .deliverable
+                            user_email_clean = email_info.email 
+                            
+                            # توليد الكود العشوائي وإرساله
                             st.session_state.generated_otp = str(random.randint(100000, 999999))
                             
                             if send_otp_to_user(user_email_clean, st.session_state.generated_otp):
@@ -282,13 +284,12 @@ with account_tab:
                                 st.success(f"تم إرسال الكود بنجاح! تفقد بريدك الوارد في الرسائل بعنوان {OFFICIAL_EMAIL}")
                     
                     except EmailNotValidError:
-                        # تظهر هذه الرسالة فوراً إذا كان الإيميل وهمي أو غير موجود على سيرفرات جوجل
+                        # تظهر هذه الرسالة إذا كان الإيميل وهمي أو غير موجود على سيرفرات جوجل
                         st.error("❌ عذراً، هذا البريد الإلكتروني غير موجود أو غير صالح لاستقبال الرسائل!")
                 else:
                     st.error("برجاء إدخال بريد جيميل صحيح ينتهي بـ @gmail.com")
             else:
                 st.warning("برجاء كتابة بريدك الإلكتروني أولاً.")
-
         # واجهة إدخال كود الـ OTP
         if st.session_state.otp_sent:
             st.divider()
