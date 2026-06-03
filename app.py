@@ -25,7 +25,7 @@ except Exception as e:
 
 # 3. Making app tabs
 questions_tab, quizzes_tab, planner_tab, account_tab = st.tabs(
-    ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅','account'])
+    ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅','account👤'])
 
 # --- 4. QUESTIONS TAB ---
 with questions_tab:
@@ -206,10 +206,10 @@ with planner_tab:
 
 # --- 7. ACCOUNT TAB (PASSWORDLESS LOGIN) ---
 with account_tab:
-    st.header("👤 Account Settings")
+    st.header("👤 Account Verification")
 
-    # تحديد الإيميل الثابت المستهدف
-    TARGET_EMAIL = "ai.studying.assisstant@gmail.com"
+    # البريد الإلكتروني الرسمي الخاص بك (الراسل الثابت)
+    OFFICIAL_EMAIL = "ai.studying.assisstant@gmail.com"
 
     # تهيئة متغيرات الجلسة (Session State) إذا لم تكن موجودة
     if "logged_in" not in st.session_state:
@@ -219,27 +219,29 @@ with account_tab:
     if "otp_sent" not in st.session_state:
         st.session_state.otp_sent = False
 
-    # دالة إرسال الإيميل باستخدام سيرفر Gmail SMTP
-    def send_otp_email(receiver_email, otp_code):
-        # ملحوظة: يجب إضافة هذه البيانات في Streamlit Secrets للأمان
+    # دالة إرسال الإيميل من حسابك الرسمي إلى حساب المستخدم
+    def send_otp_to_user(user_email, otp_code):
         try:
-            sender_email = st.secrets["SMTP_EMAIL"]       # إيميل الإرسال الخاص بك
-            sender_password = st.secrets["SMTP_PASSWORD"] # كود التطبيق (App Password) من جوجل
+            # يتم جلب كلمة مرور التطبيق الخاصة بإيميلك الرسمي من الـ Secrets بأمان
+            sender_password = st.secrets["SMTP_PASSWORD"]
         except Exception:
-            st.error("خطأ: يرجى إعداد SMTP_EMAIL و SMTP_PASSWORD في الـ Secrets الخاصة بـ Streamlit أولاً.")
+            st.error("خطأ: يرجى إعداد SMTP_PASSWORD في الـ Secrets الخاصة بـ Streamlit أولاً.")
             return False
 
-        # تجهيز محتوى الرسالة
-        msg = MIMEText(f"مرحباً بك في AI Studying Assistant✨\n\nكود التحقق الخاص بك هو: {otp_code}\nصالح للاستخدام الآن.")
-        msg['Subject'] = "كود التحقق الخاص بحسابك (Verification Code)"
-        msg['From'] = sender_email
-        msg['To'] = receiver_email
+        # تجهيز محتوى الرسالة وتحديد العنوان المطلوب
+        email_content = f"مرحباً بك في AI Studying Assistant✨\n\nكود التحقق الخاص بك هو: {otp_code}\n\nتم إرسال هذا الكود بناءً على طلبك لتسجيل الدخول."
+        msg = MIMEText(email_content, 'plain', 'utf-8')
+        
+        # جعل عنوان الرسالة واضحاً باسم البريد الرسمي الخاص بك
+        msg['Subject'] = f"Verification Code from {OFFICIAL_EMAIL}"
+        msg['From'] = OFFICIAL_EMAIL
+        msg['To'] = user_email
 
         try:
-            # الاتصال بسيرفر Gmail
+            # الاتصال بسيرفر Gmail الآمن لإرسال الرسالة
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
-                server.login(sender_email, sender_password)
-                server.sendmail(sender_email, receiver_email, msg.as_string())
+                server.login(OFFICIAL_EMAIL, sender_password)
+                server.sendmail(OFFICIAL_EMAIL, user_email, msg.as_string())
             return True
         except Exception as e:
             st.error(f"فشل في إرسال الإيميل: {e}")
@@ -247,49 +249,49 @@ with account_tab:
 
     # --- واجهة المستخدم بناءً على حالة تسجيل الدخول ---
     if not st.session_state.logged_in:
-        st.subheader("تسجيل الدخول الإلكتروني")
+        st.subheader("تسجيل الدخول عبر البريد الإلكتروني")
         
-        # حقل الإيميل (مكتوب فيه الإيميل تلقائياً ويمكن تعديله أو تركه ثابت)
-        email_input = st.text_input("أدخل البريد الإلكتروني لتلقي الكود:", value=TARGET_EMAIL)
+        # حقل يدخل فيه المستخدم بريده الإلكتروني الشخصي (الجيميل بتاعه)
+        user_email_input = st.text_input("أدخل بريدك الإلكتروني (Gmail):", placeholder="example@gmail.com")
 
-        # زر إرسال الكود
-        if st.button("إرسال كود التحقق ✉️"):
-            if email_input:
-                # توليد كود عشوائي من 6 أرقام
-                st.session_state.generated_otp = str(random.randint(100000, 999999))
-                
-                with st.spinner("جاري إرسال الكود إلى بريدك الإلكتروني..."):
-                    if send_otp_email(email_input, st.session_state.generated_otp):
-                        st.session_state.otp_sent = True
-                        st.success(f"تم إرسال كود التحقق بنجاح إلى {email_input} 🎉")
+        # زر إرسال الكود إلى بريد المستخدم
+        if st.button("طلب كود التحقق ✉️"):
+            if user_email_input:
+                if "@gmail.com" in user_email_input.lower():
+                    # توليد كود عشوائي من 6 أرقام
+                    st.session_state.generated_otp = str(random.randint(100000, 999999))
+                    
+                    with st.spinner("جاري إرسال كود التحقق إلى بريدك..."):
+                        if send_otp_to_user(user_email_input, st.session_state.generated_otp):
+                            st.session_state.otp_sent = True
+                            st.success(f"تم إرسال الكود بنجاح! تفقد بريدك الوارد في الرسائل بعنوان {OFFICIAL_EMAIL}")
+                else:
+                    st.error("برجاء إدخال بريد جيميل صحيح ينتهي بـ @gmail.com")
             else:
-                st.warning("برجاء إدخال البريد الإلكتروني أولاً.")
+                st.warning("برجاء كتابة بريدك الإلكتروني أولاً.")
 
-        # إذا تم إرسال الكود بنجاح، نظهر حقل إدخال الـ OTP
+        # إذا تم إرسال الكود بنجاح، يظهر حقل التأكيد
         if st.session_state.otp_sent:
             st.divider()
-            otp_input = st.text_input("أدخل كود التحقق المكون من 6 أرقام:", type="password")
+            otp_input = st.text_input("أدخل كود التحقق المستلم (OTP):", type="password", placeholder="******")
             
-            if st.button("تأكيد الدخول ✅"):
+            if st.button("تأكيد الدخول والتحقق ✅"):
                 if otp_input == st.session_state.generated_otp:
                     st.session_state.logged_in = True
-                    st.session_state.user_email = email_input
-                    st.success("تم تسجيل الدخول بنجاح! 🎉")
-                    st.rerun() # إعادة تحميل الصفحة لتحديث الواجهة
+                    st.session_state.user_email = user_email_input
+                    st.success("تم التحقق وتسجيل الدخول بنجاح! 🎉")
+                    st.rerun()
                 else:
-                    st.error("كود التحقق غير صحيح، يرجى المحاولة مرة أخرى.")
+                    st.error("كود التحقق غير صحيح، يرجى مراجعة الإيميل والمحاولة مرة أخرى.")
     else:
-        # واجهة المستخدم بعد تسجيل الدخول بنجاح
-        st.success(f"مرحباً بك! أنت مسجل الدخول حالياً بحساب: **{st.session_state.user_email}**")
+        # واجهة المستخدم المفتوحة بعد تسجيل الدخول
+        st.success(f"مرحباً بك! الحساب النشط حالياً: **{st.session_state.user_email}**")
+        st.info(f"هذا الحساب تم التحقق منه وإرسال بياناته عبر البريد الرسمي: {OFFICIAL_EMAIL}")
         
-        # معلومات الحساب أو لوحة التحكم الخاصة بالطالب
-        st.info("يمكنك الآن استخدام كافة ميزات المساعد الدراسي وتتبع تقدمك.")
-        
-        # زر تسجيل الخروج
+        # زر تسجيل الخروج لإعادة تصفير الحالة
         if st.button("تسجيل الخروج 🚪"):
             st.session_state.logged_in = False
             st.session_state.generated_otp = None
             st.session_state.otp_sent = False
             st.session_state.user_email = None
             st.rerun()
-
