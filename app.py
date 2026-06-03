@@ -5,7 +5,7 @@ import smtplib
 from email.mime.text import MIMEText
 import random
 from streamlit_cookies_controller import CookieController
-
+from email_validator import validate_email, EmailNotValidError
 # --- APP CONFIG & SETUP ---
 st.set_page_config(page_title="AI Study Assistant", layout="wide")
 st.title('AI Studying Assistant✨')
@@ -211,15 +211,14 @@ with account_tab:
 
     OFFICIAL_EMAIL = "ai.studying.assisstant@gmail.com"
     
-    # تهيئة متحكم الكوكيز لحفظ تسجيل الدخول في المتصفح
+    # تهيئة متحكم الكوكيز لحفظ الجلسة في المتصفح
     controller = CookieController()
 
-    # محاولة جلب الإيميل المحفوظ في الكوكيز (لو كان معلم على تذكرني سابقاً)
+    # محاولة جلب الإيميل إذا كان المستخدم اختار "تذكرني" سابقاً
     saved_user = controller.get("remembered_user")
 
     # تهيئة متغيرات الجلسة (Session State)
     if "logged_in" not in st.session_state:
-        # لو فيه مستخدم محفوظ في الكوكيز، بنسجل دخوله تلقائياً
         if saved_user:
             st.session_state.logged_in = True
             st.session_state.user_email = saved_user
@@ -251,7 +250,7 @@ with account_tab:
                 server.sendmail(OFFICIAL_EMAIL, user_email, msg.as_string())
             return True
         except Exception as e:
-            st.error(f"Failing to send email: {e}")
+            st.error(f"فشل في إرسال الإيميل: {e}")
             return False
 
     # --- واجهة المستخدم ---
@@ -260,23 +259,37 @@ with account_tab:
         
         user_email_input = st.text_input("أدخل بريدك الإلكتروني (Gmail):", placeholder="example@gmail.com")
         
-        # إضافة خيار بقاء تسجيل الدخول (تشيك بوكس)
+        # خيار بقاء تسجيل الدخول
         remember_me = st.checkbox("البقاء قيد تسجيل الدخول (تذكرني) 🔐")
 
         if st.button("طلب كود التحقق ✉️"):
             if user_email_input:
-                if "@gmail.com" in user_email_input.lower():
-                    st.session_state.generated_otp = str(random.randint(100000, 999999))
+                # تحويل الإيميل للحروف الصغيرة لحمايته من حساسية الحروف
+                email_to_check = user_email_input.strip().lower()
+                
+                if "@gmail.com" in email_to_check:
+                    try:
+                        with st.spinner("جاري التحقق من وجود الحساب وإرسال الكود..."):
+                            # الطريقة الثانية: فحص وجود صندوق البريد وسيرفر الجيميل حقيقةً على الإنترنت
+                            email_info = validate_email(email_to_check, check_deliverability=True)
+                            user_email_clean = email_info.deliverable # الإيميل بعد تنظيفه والتأكد منه
+                            
+                            # إذا مر الفحص بنجاح، نولد الكود ونرسله
+                            st.session_state.generated_otp = str(random.randint(100000, 999999))
+                            
+                            if send_otp_to_user(user_email_clean, st.session_state.generated_otp):
+                                st.session_state.otp_sent = True
+                                st.success(f"تم إرسال الكود بنجاح! تفقد بريدك الوارد في الرسائل بعنوان {OFFICIAL_EMAIL}")
                     
-                    with st.spinner("جاري إرسال كود التحقق إلى بريدك..."):
-                        if send_otp_to_user(user_email_input, st.session_state.generated_otp):
-                            st.session_state.otp_sent = True
-                            st.success(f"تم إرسال الكود بنجاح! تفقد بريدك الوارد في الرسائل بعنوان {OFFICIAL_EMAIL}")
+                    except EmailNotValidError:
+                        # تظهر هذه الرسالة فوراً إذا كان الإيميل وهمي أو غير موجود على سيرفرات جوجل
+                        st.error("❌ عذراً، هذا البريد الإلكتروني غير موجود أو غير صالح لاستقبال الرسائل!")
                 else:
                     st.error("برجاء إدخال بريد جيميل صحيح ينتهي بـ @gmail.com")
             else:
                 st.warning("برجاء كتابة بريدك الإلكتروني أولاً.")
 
+        # واجهة إدخال كود الـ OTP
         if st.session_state.otp_sent:
             st.divider()
             otp_input = st.text_input("أدخل كود التحقق المستلم (OTP):", type="password", placeholder="******")
@@ -286,7 +299,7 @@ with account_tab:
                     st.session_state.logged_in = True
                     st.session_state.user_email = user_email_input
                     
-                    # إذا اختار تذكرني، نقوم بحفظ إيميله في كوكيز المتصفح لمدة 30 يوم مثلاً
+                    # حفظ الكوكيز في المتصفح إذا اختار "تذكرني"
                     if remember_me:
                         controller.set("remembered_user", user_email_input)
                     
@@ -295,14 +308,14 @@ with account_tab:
                 else:
                     st.error("كود التحقق غير صحيح، يرجى مراجعة الإيميل والمحاولة مرة أخرى.")
     else:
+        # واجهة المستخدم بعد تسجيل الدخول
         st.success(f"مرحباً بك! الحساب النشط حالياً: **{st.session_state.user_email}**")
         st.info(f"هذا الحساب تم التحقق منه وإرسال بياناته عبر البريد الرسمي: {OFFICIAL_EMAIL}")
         
         if st.button("تسجيل الخروج 🚪"):
-            # عند تسجيل الخروج، نمسح البيانات من الـ Session ومن كوكيز المتصفح تماماً
             st.session_state.logged_in = False
             st.session_state.generated_otp = None
             st.session_state.otp_sent = False
             st.session_state.user_email = None
-            controller.remove("remembered_user") # حذف الكوكيز
+            controller.remove("remembered_user") # حذف الكوكيز عند تسجيل الخروج
             st.rerun()
