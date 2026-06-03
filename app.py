@@ -141,13 +141,13 @@ with questions_tab:
             prompt = f"Expert {subject} assistant. Level: {edu_level}. Tone: {tone}. Detail: {details}. Question: {question}"
             with st.spinner('Thinking...'):
                 try:
-                    # محاولة توليد الرد
                     answer = model.generate_content(prompt)
                     st.write(answer.text)
                 except Exception as e:
-                    # في حالة وجود أي خطأ في السيرفر أو الإنترنت، يظهر رسالة بدلاً من انهيار التطبيق
-                    st.error(f"عذراً، حدث خطأ أثناء الاتصال بالذكاء الاصطناعي. تفاصيل الخطأ: {e}")
-
+                    if "quota" in str(e).lower() or "429" in str(e):
+                        st.warning("⚠️ لقد تجاوزت حد الطلبات المسموح به حالياً. انتظر دقيقة واكتب سؤالك مجدداً.")
+                    else:
+                        st.error(f"عذراً، حدث خطأ أثناء الاتصال بالذكاء الاصطناعي.")
 # --- 5. QUIZZES CONFIG & TAB ---
 class QuizQuestion(typing.TypedDict):
     question: str
@@ -179,7 +179,6 @@ with quizzes_tab:
                 The difficulty must be strictly for {grade_level} students at a {difficulty} level.
                 """
                 try:
-                    # إجبار الموديل على الالتزام بالقالب الرياضي والـ Schema لمنع الانهيار
                     response = model.generate_content(
                         quiz_prompt,
                         generation_config={
@@ -187,13 +186,17 @@ with quizzes_tab:
                             "response_schema": list[QuizQuestion],
                         },
                     )
-                    
                     st.session_state.quiz_data = json.loads(response.text)
                     st.session_state.user_answers = {}
                     st.session_state.quiz_submitted = False
                     st.success("تم صياغة الاختبار بنجاح! حل الأسئلة بالأسفل 👇")
+                    
                 except Exception as e:
-                    st.error("الخادم مشغول حالياً، يرجى إعادة الضغط على زر التوليد مرة أخرى.")
+                    # هنا بنفحص لو الرسالة فيها كلمة كوتا أو حد أقصى
+                    if "quota" in str(e).lower() or "429" in str(e):
+                        st.warning("⚠️ لقد قمت بإرسال طلبات كثيرة في وقت قصير. يرجى الانتظار لمدة دقيقة ثم المحاولة مرة أخرى.")
+                    else:
+                        st.error("الخادم مشغول حالياً، يرجى إعادة الضغط على زر التوليد مرة أخرى.")
         else:
             st.warning("Please enter a subject first!")
 
