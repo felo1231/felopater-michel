@@ -105,14 +105,14 @@ if not st.session_state.logged_in:
             else:
                 st.error("كود التحقق غير صحيح، يرجى مراجعة الإيميل والمحاولة مرة أخرى.")
                 
-    # هنا نقوم بإيقاف السكريبت تماماً فلا يظهر أي شيء بالأسفل
     st.stop()
 
 
 # --- بقية التطبيق تظهر فقط إذا تخطى شرط تسجيل الدخول بالأعلى ---
-# 3. Making app tabs
+# إنشاء الـ Tabs مرة واحدة بشكل سليم
 questions_tab, quizzes_tab, planner_tab, account_tab = st.tabs(
     ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅', 'Account 👤'])
+
 # --- 4. QUESTIONS TAB ---
 with questions_tab:
     col1, col2 = st.columns(2)
@@ -135,30 +135,27 @@ with questions_tab:
                 answer = model.generate_content(prompt)
             st.write(answer.text)
 
-# --- QUIZZES TAB WITH GRADE LEVELS ---
+# --- 5. QUIZZES TAB WITH GRADE LEVELS ---
 with quizzes_tab:
     st.header("Interactive Quiz 🧠")
 
-    # Input fields
     col_q1, col_q2 = st.columns(2)
     with col_q1:
         quiz_subject = st.text_input("Subject:", placeholder="e.g. Algebra or Python")
-        # Adding the Grade Level selector
         grade_level = st.selectbox(
             "Select your Grade/Level:",
             options=["Grade 1","Grade 2","Grade 3","Grade 4","Grade 5","Grade 6","Grade 7", "Grade 8", "Grade 9", "High School", "University"],
-            index=1 # Defaults to Grade 8
+            index=7 # تم ضبط المؤشر الافتراضي ليكون على الصف الثامن مباشرة
         )
 
     with col_q2:
         num_q = st.slider("Number of Questions:", 1, 10, 3)
         difficulty = st.select_slider("Style:", options=["Basic", "mediam", "Challenge"])
 
-    # GENERATION LOGIC
+    # زر توليد الكويز الرئيسي
     if st.button("Generate My Quiz 📝"):
         if quiz_subject:
             with st.spinner(f'Creating a {grade_level} quiz...'):
-                # We update the prompt to include the grade_level
                 quiz_prompt = f"""
                 Create a {num_q} question multiple-choice quiz about {quiz_subject}.
                 The difficulty must be strictly for {grade_level} students at a {difficulty} level.
@@ -173,9 +170,8 @@ with quizzes_tab:
                   }}
                 ]
                 """
-                response = model.generate_content(quiz_prompt)
-
                 try:
+                    response = model.generate_content(quiz_prompt)
                     raw_json = response.text.replace('```json', '').replace('```', '').strip()
                     st.session_state.quiz_data = json.loads(raw_json)
                     st.session_state.user_answers = {}
@@ -185,7 +181,7 @@ with quizzes_tab:
         else:
             st.warning("Please enter a subject first!")
 
-    # DISPLAY & GRADING LOGIC (remains the same as before)
+    # عرض الكويز وتصحيحه
     if "quiz_data" in st.session_state:
         st.divider()
         with st.form("quiz_form"):
@@ -205,7 +201,6 @@ with quizzes_tab:
             score = 0
             st.divider()
 
-            # 1. Calculate Results
             for i, q_item in enumerate(st.session_state.quiz_data):
                 user_choice = st.session_state.user_answers[i]
                 if user_choice == q_item["answer"]:
@@ -215,54 +210,30 @@ with quizzes_tab:
                     st.error(f"Question {i+1}: Not quite.")
                     st.info(f"The right answer was: **{q_item['answer']}**")
 
-            # 2. Calculate Percentage
             total_questions = len(st.session_state.quiz_data)
             percentage = (score / total_questions) * 100
 
-            # 3. Display Rewards & Encouragement
             st.header("Your Performance Report 📊")
-
-            # Use columns to show score and percentage nicely
             col_res1, col_res2 = st.columns(2)
             col_res1.metric("Final Score", f"{score} / {total_questions}")
             col_res2.metric("Percentage", f"{percentage:g}%")
 
-            # 4. Feedback Logic
             if percentage == 100:
                 st.success("### 🏆 Mastermind Status!")
-                st.write("Perfect score! You've completely mastered this topic. Time to level up to a 'Challenge' difficulty!")
-
+                st.write("Perfect score! You've completely mastered this topic.")
             elif percentage >= 80:
                 st.success("### 🚀 Outstanding Work!")
-                st.write("You're a natural at this. Just a tiny bit more focus and you'll be at 100% in no time.")
-
+                st.write("You're a natural at this. Just a tiny bit more focus and you'll be at 100%.")
             elif percentage >= 60:
                 st.warning("### 📈 Great Progress!")
-                st.write("You've got the core concepts down! Review the questions you missed to lock in that knowledge.")
-
+                st.write("You've got the core concepts down! Review the questions you missed.")
             elif percentage >= 40:
                 st.info("### 🧠 Brain Power Building!")
-                st.write("Every mistake is just a data point for learning. Keep practicing—you're getting there!")
-
+                st.write("Every mistake is just a learning point. Keep practicing!")
             else:
                 st.error("### 🛡️ Don't Give Up!")
-                st.write("This was a tough one, but persistence is the key to becoming a pro. Let's try a 'Basic' level quiz to build your confidence!")
+                st.write("Let's try a 'Basic' level quiz to build your confidence!")
 
-            st.metric("Final Score", f"{score} / {len(st.session_state.quiz_data)}")
-
-    # 1. Define the variable FIRST (even if empty)
-    quiz_prompt = ""
-
-    # 2. Only fill it when the button is clicked
-    if st.button("Generate New Quiz 📝"):
-        quiz_prompt = f"Create a {num_q} question multiple-choice quiz about {quiz_subject}."
-
-        # 3. Only call the model INSIDE the same block
-        with st.spinner('Generating...'):
-            response = model.generate_content(quiz_prompt)
-            # ... process response ...
-
-# OR, if you need the variable elsewhere, ensure it is defined at the top of the tab
 # --- 6. STUDY PLANNER TAB ---
 with planner_tab:
     st.header("Plan Your Success 📅")
@@ -290,42 +261,22 @@ with planner_tab:
         else:
             st.warning("Tell me what you want to learn!")
 
-# --- 4. QUESTIONS TAB ---
-with questions_tab:
-    # كود الـ Q&A القديم بتاعك هنا...
-    pass
-
-# --- 5. QUIZZES TAB ---
-with quizzes_tab:
-    # كود الـ Quizzes القديم بتاعك هنا...
-    pass
-
-# --- 6. STUDY PLANNER TAB ---
-with planner_tab:
-    # كود الـ Study Planner القديم بتاعك هنا...
-    pass
-
-# --- 7. ACCOUNT TAB (لعرض الحساب وتسجيل الخروج فقط) ---
+# --- 7. ACCOUNT TAB ---
 with account_tab:
     st.header("👤 Account Settings")
     st.success(f"مرحباً بك! أنت مسجل الدخول حالياً بحساب: **{st.session_state.user_email}**")
     st.info(f"البريد الرسمي للمساعد الدراسي: {OFFICIAL_EMAIL}")
     
     if st.button("تسجيل الخروج 🚪"):
-        # 1. تصفير متغيرات الجلسة أولاً
         st.session_state.logged_in = False
         st.session_state.generated_otp = None
         st.session_state.otp_sent = False
         st.session_state.user_email = None
         
-        # 2. حذف الكوكيز بأمان بدون حدوث KeyError
         try:
-            # نتحقق أولاً إذا كان الكوكيز موجوداً في المتصفح قبل حذفه
             if controller.get("remembered_user"):
                 controller.remove("remembered_user")
         except Exception:
-            # إذا حدث أي خطأ غير متوقع أثناء الحذف، يتجاهله الكود ويستمر بسلام
             pass
             
-        # 3. إعادة تنشيط الصفحة لتطبيق التغييرات فوراً وحظر الدخول
         st.rerun()
