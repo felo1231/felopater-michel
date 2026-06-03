@@ -13,10 +13,12 @@ st.set_page_config(page_title="AI Study Assistant", layout="wide")
 st.title('AI Studying Assistant✨')
 
 # --- GEMINI SETUP ---
+# --- GEMINI SETUP ---
 try:
     api_key = st.secrets["GEMINI_API_KEY"]
     ai.configure(api_key=api_key)
-    model = ai.GenerativeModel(model_name='gemini-3-flash-preview')
+    # 🌟 التعديل هنا: استخدام الموديل الرسمي المدعوم والمستقر
+    model = ai.GenerativeModel(model_name='gemini-1.5-flash')
 except Exception as e:
     st.error("خطأ في إعدادات الاتصال: تأكد من إضافة GEMINI_API_KEY في إعدادات التطبيق.")
     st.stop()
@@ -123,14 +125,21 @@ with questions_tab:
     question = st.chat_input('Enter your question:')
 
     if question:
+        # عرض سؤال المستخدم
         with st.chat_message('human', avatar='😉'):
             st.write(question)
+            
+        # عرض رد الذكاء الاصطناعي
         with st.chat_message('ai', avatar='🤖'):
             prompt = f"Expert {subject} assistant. Level: {edu_level}. Tone: {tone}. Detail: {details}. Question: {question}"
             with st.spinner('Thinking...'):
-                answer = model.generate_content(prompt)
-            st.write(answer.text)
-
+                try:
+                    # محاولة توليد الرد
+                    answer = model.generate_content(prompt)
+                    st.write(answer.text)
+                except Exception as e:
+                    # في حالة وجود أي خطأ في السيرفر أو الإنترنت، يظهر رسالة بدلاً من انهيار التطبيق
+                    st.error(f"عذراً، حدث خطأ أثناء الاتصال بالذكاء الاصطناعي. تفاصيل الخطأ: {e}")
 
 # --- 5. QUIZZES CONFIG & TAB ---
 class QuizQuestion(typing.TypedDict):
