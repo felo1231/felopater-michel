@@ -134,7 +134,7 @@ with questions_tab:
         with st.chat_message('human', avatar='😉'):
             st.write(question)
             
-        # عرض رد الذكاء الاصطناعي بنظام حماية ضد الـ ResourceExhausted والـ 429
+        # عرض رد الذكاء الاصطناعي مع نظام حماية ذكي لمنع الانهيار
         with st.chat_message('ai', avatar='🤖'):
             prompt = f"Expert {subject} assistant. Level: {edu_level}. Tone: {tone}. Detail: {details}. Question: {question}"
             with st.spinner('Thinking...'):
@@ -142,11 +142,10 @@ with questions_tab:
                     answer = model.generate_content(prompt)
                     st.write(answer.text)
                 except Exception as e:
-                    # فحص طبيعة الخطأ وعرض رسالة تنبيهية بدلاً من انهيار التطبيق بالكامل
                     if "quota" in str(e).lower() or "429" in str(e) or "exhausted" in str(e).lower():
-                        st.warning("⚠️ لقد تجاوزت حد الطلبات المسموح به حالياً (Quota Exhausted). يرجى الانتظار لمدة دقيقة واحدة ثم إعادة كتابة سؤالك.")
+                        st.warning("⚠️ لقد تجاوزت حد الطلبات المسموح به حالياً (Quota Exhausted). يرجى الانتظار دقيقة واحدة ثم أعد إرسال سؤالك.")
                     else:
-                        st.error("عذراً، الخادم مشغول حالياً. يرجى الانتظار قليلاً والمحاولة مرة أخرى.")
+                        st.error("عذراً، الخادم مشغول حالياً. يرجى المحاولة مرة أخرى بعد قليل.")
 
 # --- 5. QUIZZES CONFIG & TAB ---
 class QuizQuestion(typing.TypedDict):
@@ -163,7 +162,7 @@ with quizzes_tab:
         grade_level = st.selectbox(
             "Select your Grade/Level:",
             options=["Grade 1","Grade 2","Grade 3","Grade 4","Grade 5","Grade 6","Grade 7", "Grade 8", "Grade 9", "High School", "University"],
-            index=7  # تم ضبط المؤشر الافتراضي ليكون على الصف الثامن مباشرة
+            index=7  # مضبوط افتراضياً على الصف الثامن
         )
 
     with col_q2:
@@ -291,24 +290,8 @@ with account_tab:
     st.success(f"مرحباً بك! أنت مسجل الدخول حالياً بحساب: **{st.session_state.user_email}**")
     st.info(f"البريد الرسمي للمساعد الدراسي: {OFFICIAL_EMAIL}")
     
-    if st.button("تسجيل الخروج 🚪"):
-        st.session_state.logged_in = False
-        st.session_state.generated_otp = None
-        st.session_state.otp_sent = False
-        st.session_state.user_email = None
-        
-        try:
-            if controller.get("remembered_user"):
-                controller.remove("remembered_user")
-        except Exception:
-            pass
-            
-        st.rerun()
-    st.header("👤 Account Settings")
-    st.success(f"مرحباً بك! أنت مسجل الدخول حالياً بحساب: **{st.session_state.user_email}**")
-    st.info(f"البريد الرسمي للمساعد الدراسي: {OFFICIAL_EMAIL}")
-    
-    if st.button("تسجيل الخروج 🚪"):
+    # 🌟 التعديل الأساسي هنا: إضافة key مخصص لمنع تكرار الـ ID في الـ Streamlit
+    if st.button("تسجيل الخروج 🚪", key="logout_button_unique"):
         st.session_state.logged_in = False
         st.session_state.generated_otp = None
         st.session_state.otp_sent = False
