@@ -17,7 +17,6 @@ st.title('AI Studying Assistant✨')
 try:
     api_key = st.secrets["GEMINI_API_KEY"]
     ai.configure(api_key=api_key)
-    st.sidebar.write(f"🔑 المفتاح الحالي يبدأ بـ: {api_key[:7]}")
     # محاولة تشغيل الموديل المستقر الحديث، وإذا لم يدعمه السيرفر يتراجع للإصدار الاحتياطي تلقائياً
     try:
         model = ai.GenerativeModel(model_name='gemini-2.0-flash')
