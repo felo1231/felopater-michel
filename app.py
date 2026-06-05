@@ -19,7 +19,7 @@ try:
     ai.configure(api_key=api_key)
     # محاولة تشغيل الموديل المستقر الحديث، وإذا لم يدعمه السيرفر يتراجع للإصدار الاحتياطي تلقائياً
     try:
-        model = ai.GenerativeModel(model_name='gemini-2.0-flash')
+        model = ai.GenerativeModel(model_name='gemini-3.5-flash')
     except Exception:
         model = ai.GenerativeModel(model_name='gemini-1.5-flash-latest')
         
