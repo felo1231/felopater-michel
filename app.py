@@ -13,8 +13,6 @@ st.set_page_config(page_title="AI Study Assistant", layout="wide")
 st.title('AI Studying Assistant✨')
 
 # --- GEMINI SETUP ---
-# --- GEMINI SETUP ---
-# --- GEMINI SETUP ---
 try:
     api_key = st.secrets["GEMINI_API_KEY"]
     ai.configure(api_key=api_key)
@@ -136,12 +134,19 @@ with questions_tab:
         with st.chat_message('human', avatar='😉'):
             st.write(question)
             
-        # عرض رد الذكاء الاصطناعي
+        # عرض رد الذكاء الاصطناعي بنظام حماية ضد الـ ResourceExhausted والـ 429
         with st.chat_message('ai', avatar='🤖'):
             prompt = f"Expert {subject} assistant. Level: {edu_level}. Tone: {tone}. Detail: {details}. Question: {question}"
             with st.spinner('Thinking...'):
+                try:
                     answer = model.generate_content(prompt)
                     st.write(answer.text)
+                except Exception as e:
+                    # فحص طبيعة الخطأ وعرض رسالة تنبيهية بدلاً من انهيار التطبيق بالكامل
+                    if "quota" in str(e).lower() or "429" in str(e) or "exhausted" in str(e).lower():
+                        st.warning("⚠️ لقد تجاوزت حد الطلبات المسموح به حالياً (Quota Exhausted). يرجى الانتظار لمدة دقيقة واحدة ثم إعادة كتابة سؤالك.")
+                    else:
+                        st.error("عذراً، الخادم مشغول حالياً. يرجى الانتظار قليلاً والمحاولة مرة أخرى.")
 
 # --- 5. QUIZZES CONFIG & TAB ---
 class QuizQuestion(typing.TypedDict):
@@ -165,7 +170,6 @@ with quizzes_tab:
         num_q = st.slider("Number of Questions:", 1, 10, 3)
         difficulty = st.select_slider("Style:", options=["Basic", "mediam", "Challenge"])
 
-    # زر توليد الكويز الرئيسي والوحيد
     if st.button("Generate My Quiz 📝"):
         if quiz_subject:
             with st.spinner(f'Creating a {grade_level} quiz...'):
@@ -187,15 +191,13 @@ with quizzes_tab:
                     st.success("تم صياغة الاختبار بنجاح! حل الأسئلة بالأسفل 👇")
                     
                 except Exception as e:
-                    # هنا بنفحص لو الرسالة فيها كلمة كوتا أو حد أقصى
-                    if "quota" in str(e).lower() or "429" in str(e):
+                    if "quota" in str(e).lower() or "429" in str(e) or "exhausted" in str(e).lower():
                         st.warning("⚠️ لقد قمت بإرسال طلبات كثيرة في وقت قصير. يرجى الانتظار لمدة دقيقة ثم المحاولة مرة أخرى.")
                     else:
                         st.error("الخادم مشغول حالياً، يرجى إعادة الضغط على زر التوليد مرة أخرى.")
         else:
             st.warning("Please enter a subject first!")
 
-    # عرض الكويز وتصحيحه
     if "quiz_data" in st.session_state:
         st.divider()
         with st.form("quiz_form"):
@@ -270,15 +272,38 @@ with planner_tab:
             Suggest specific resources or topics to cover.
             """
             with st.spinner('Mapping out your journey...'):
-                plan_res = model.generate_content(plan_prompt)
-            st.info("Here is your personalized study roadmap:")
-            st.markdown(plan_res.text)
+                try:
+                    plan_res = model.generate_content(plan_prompt)
+                    st.info("Here is your personalized study roadmap:")
+                    st.markdown(plan_res.text)
+                except Exception as e:
+                    if "quota" in str(e).lower() or "429" in str(e) or "exhausted" in str(e).lower():
+                        st.warning("⚠️ انتهت كوتا الاستخدام المؤقتة. انتظر دقيقة ثم اضغط على الزر مجدداً لتوليد الخطة الدراسية.")
+                    else:
+                        st.error("حدث خطأ ما أثناء إعداد الخطة. حاول مرة أخرى.")
         else:
             st.warning("Tell me what you want to learn!")
 
 
 # --- 7. ACCOUNT TAB ---
 with account_tab:
+    st.header("👤 Account Settings")
+    st.success(f"مرحباً بك! أنت مسجل الدخول حالياً بحساب: **{st.session_state.user_email}**")
+    st.info(f"البريد الرسمي للمساعد الدراسي: {OFFICIAL_EMAIL}")
+    
+    if st.button("تسجيل الخروج 🚪"):
+        st.session_state.logged_in = False
+        st.session_state.generated_otp = None
+        st.session_state.otp_sent = False
+        st.session_state.user_email = None
+        
+        try:
+            if controller.get("remembered_user"):
+                controller.remove("remembered_user")
+        except Exception:
+            pass
+            
+        st.rerun()
     st.header("👤 Account Settings")
     st.success(f"مرحباً بك! أنت مسجل الدخول حالياً بحساب: **{st.session_state.user_email}**")
     st.info(f"البريد الرسمي للمساعد الدراسي: {OFFICIAL_EMAIL}")
