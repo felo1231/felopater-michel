@@ -140,14 +140,9 @@ with questions_tab:
         with st.chat_message('ai', avatar='🤖'):
             prompt = f"Expert {subject} assistant. Level: {edu_level}. Tone: {tone}. Detail: {details}. Question: {question}"
             with st.spinner('Thinking...'):
-                try:
                     answer = model.generate_content(prompt)
                     st.write(answer.text)
-                except Exception as e:
-                    if "quota" in str(e).lower() or "429" in str(e):
-                        st.warning("⚠️ لقد تجاوزت حد الطلبات المسموح به حالياً. انتظر دقيقة واكتب سؤالك مجدداً.")
-                    else:
-                        st.error(f"عذراً، حدث خطأ أثناء الاتصال بالذكاء الاصطناعي.")
+
 # --- 5. QUIZZES CONFIG & TAB ---
 class QuizQuestion(typing.TypedDict):
     question: str
