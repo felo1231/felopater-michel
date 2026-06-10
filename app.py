@@ -308,50 +308,22 @@ with account_tab:
 
 with model_tab:
     st.header("🎨 Generate Your Photo On 3D Model")
-    st.write("اكتب وصفاً لأي شيء تريد تخيله كمجسم ثلاثي الأبعاد أو مشهد مجسم، وسيقوم التطبيق بتوليد الفكرة وعرضها لك!")
+    
+    user_prompt = st.text_input("أدخل وصف الشيء الذي تريده:", placeholder="مثال: plant")
 
-    # خانة إدخال النص للمستخدم
-    user_prompt = st.text_input(
-        "أدخل وصف الصورة أو المجسم المُراد توليده:", 
-        placeholder="مثال: A futuristic drone, 3d asset, isometric, blender render, highly detailed"
-    )
-
-    # زر التوليد بالاسم المطلوب تماماً
     if st.button("generate 3d photo"):
         if user_prompt:
-            with st.spinner("جاري التفكير وتوليد المشهد ثلاثي الأبعاد... 🚀"):
-                # نطلب من جيميناي تحليل وتوسيع فكرة المستخدم ليعطينا فكرة فنية مذهلة للمجسم
-                ai_prompt = f"""
-                Act as a 3D artist and conceptual designer. 
-                Provide a brilliant, detailed structural description and artistic review for a 3D model of: '{user_prompt}'.
-                Mention details like textures, materials (e.g., metallic, glass, matte), lighting setup, and environment.
-                Keep the response clear and inspiring.
-                """
-                try:
-                    # توليد التحليل النصي للمجسم
-                    response = model.generate_content(ai_prompt)
-                    
-                    st.subheader("💡 المفهوم الفني للمجسم (3D Concept Breakdown):")
-                    st.markdown(response.text)
-                    
-                    st.divider()
-                    st.subheader("🖼️ المعاينة المرئية التخيلية (Visual Preview):")
-                    
-                    # هندسة النص لتوليد ستايل ثلاثي الأبعاد مبهر في الرابط
-                    enhanced_search_prompt = f"{user_prompt}, 3d model, detailed render, unreal engine 5, cinematic lighting"
-                    encoded_prompt = enhanced_search_prompt.replace(" ", "%20")
-                    
-                    # استخدام محرك توليد الصور الفوري والمجاني لعرض النتيجة للمستخدم مباشرة
-                    image_url = f"https://image.pollinations.ai/p/{encoded_prompt}?width=800&height=600&enhance=true"
-                    
-                    # عرض الصورة الناتجة في التطبيق
-                    st.image(image_url, caption=f"رؤية ثلاثية الأبعاد تخيلية لـ: {user_prompt}", use_container_width=True)
-                    
-                except Exception as e:
-                    st.error("عذراً، حدث خطأ أثناء الاتصال أو توليد الصورة. يرجى المحاولة مرة أخرى.")
+            with st.spinner("جاري الإبداع..."):
+                # تحسين الوصف لضمان ظهور النتيجة
+                enhanced_prompt = f"a high quality 3d model render of {user_prompt}, cinematic lighting, 8k, detailed texture"
+                
+                # استخدام رابط التوليد مع الوصف المحسن
+                encoded_prompt = enhanced_prompt.replace(" ", "%20")
+                image_url = f"https://image.pollinations.ai/p/{encoded_prompt}?width=800&height=600&nologo=true"
+                
+                st.image(image_url, caption=f"نتائج البحث عن: {user_prompt}", use_container_width=True)
         else:
-            st.warning("من فضلك اكتب الوصف أولاً في الخانة المخصصة قبل الضغط على الزر! ⚠️")
-
+            st.warning("من فضلك اكتب اسم الشيء أولاً!")
 # --- CUSTOM CSS FOR PREMIUM LOOK ---
 st.markdown("""
     <style>
@@ -442,6 +414,28 @@ st.markdown("""
         border-radius: 16px !important;
         margin-bottom: 10px !important;
         border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    .stApp {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%) !important;
+        color: #f8fafc !important;
+        font-size: 18px !important; /* زيادة حجم الخط الأساسي */
+    }
+    
+    /* تكبير خط الأزرار */
+    .stButton>button {
+        font-size: 18px !important; 
+        font-weight: 600 !important;
+        padding: 15px 30px !important;
+    }
+    
+    /* تحسين النصوص داخل التطبيق */
+    p, label, div {
+        font-size: 18px !important;
+    }
+    
+    /* تحسين حجم الخط في الـ Tabs */
+    .stTabs [data-baseweb="tab"] {
+        font-size: 16px !important;
+        font-weight: 700 !important;0
     }
     </style>
 """, unsafe_allow_html=True)
