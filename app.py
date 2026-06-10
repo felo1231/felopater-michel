@@ -47,6 +47,10 @@ if "otp_sent" not in st.session_state:
 if "quiz_index" not in st.session_state:
     st.session_state.quiz_index = 0
 
+# 🌟 1. هنا قمنا بتعريف سجل المحادثات لحفظ الشات من الاختفاء
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+
 def send_otp_to_user(user_email, otp_code):
     try:
         sender_password = st.secrets["SMTP_PASSWORD"]
@@ -128,17 +132,33 @@ with questions_tab:
         edu_level = st.selectbox(label='Choose educational level:', options=['School', 'University', 'Graduated'], key='q_edu')
 
     st.divider()
+    
+    # 🌟 2. هنا نقوم بعرض كل رسائل الشات القديمة المخزنة قبل خانة الكتابة
+    for msg in st.session_state.chat_history:
+        with st.chat_message(msg["role"], avatar=msg["avatar"]):
+            st.write(msg["text"])
+
     question = st.chat_input('Enter your question:')
 
     if question:
+        # حفظ وعرض سؤال المستخدم في السجل
+        st.session_state.chat_history.append({"role": "human", "avatar": "😉", "text": question})
         with st.chat_message('human', avatar='😉'):
             st.write(question)
             
+        # توليد وحفظ وعرض رد الذكاء الاصطناعي في السجل
         with st.chat_message('ai', avatar='🤖'):
             prompt = f"Expert {subject} assistant. Level: {edu_level}. Tone: {tone}. Detail: {details}. Question: {question}"
             with st.spinner('Thinking...'):
+                try:
                     answer = model.generate_content(prompt)
                     st.write(answer.text)
+                    st.session_state.chat_history.append({"role": "ai", "avatar": "🤖", "text": answer.text})
+                except Exception as e:
+                    st.error("عذراً، حدث خطأ أثناء الاتصال بالخادم.")
+        
+        # إعادة تشغيل سريعة لتثبيت الشات في مكانه الصحيح فوق خانة الكتابة
+        st.rerun()
 
 # --- 5. QUIZZES CONFIG & TAB ---
 class QuizQuestion(typing.TypedDict):
@@ -180,7 +200,7 @@ with quizzes_tab:
                     st.session_state.quiz_data = json.loads(response.text)
                     st.session_state.user_answers = {}
                     st.session_state.quiz_submitted = False
-                    st.session_state.quiz_index += 1  # زيادة العداد لتصفير أزرار الراديو القديمة
+                    st.session_state.quiz_index += 1  
                     st.success("تم صياغة الاختبار بنجاح! حل الأسئلة بالأسفل 👇")
                     
                 except Exception as e:
@@ -197,7 +217,6 @@ with quizzes_tab:
             for i, q_item in enumerate(st.session_state.quiz_data):
                 st.subheader(f"Question {i+1}")
                 st.write(q_item["question"])
-                # ربط الـ key بالـ quiz_index يمنع بقاء الإجابات السابقة معلمة
                 st.session_state.user_answers[i] = st.radio(
                     "Select an option:",
                     options=q_item["options"],
