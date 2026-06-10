@@ -290,49 +290,44 @@ with planner_tab:
         else:
             st.warning("Tell me what you want to learn!")
 
-# --- 7. ACCOUNT TAB ---
-with account_tab:
-    st.header("👤 Account Settings")
-    st.success(f"مرحباً بك! أنت مسجل الدخول حالياً بحساب: **{st.session_state.user_email}**")
-    st.info(f"البريد الرسمي للمساعد الدراسي: {OFFICIAL_EMAIL}")
+# --- 8. 3D MODELS TAB (تم تعديل الكود هنا) ---
+with model_tab:
+    st.header("Generate a 3D Photo 🎨")
     
-    if st.button("تسجيل الخروج 🚪"):
-        st.session_state.logged_in = False
-        st.session_state.generated_otp = None
-        st.session_state.otp_sent = False
-        st.session_state.user_email = None
-        
-        try:
-            if controller.get("remembered_user"):
-                controller.remove("remembered_user")
-        except Exception:
-            pass
-            
-        st.rerun()
+    # 1. إدخال النص من المستخدم
+    user_prompt = st.text_input("اكتب وصفاً للصورة التي تريدها:", placeholder="مثال: Lighthouse on a cliff")
+    
+    # 2. زر التنفيذ
+    if st.button("Generate 3D Photo"):
+        if not user_prompt:
+            st.warning("يرجى كتابة وصف أولاً!")
+        else:
+            with st.spinner("جاري الاتصال بـ Stability AI..."):
+                try:
+                    # 3. تنفيذ الطلب
+                    response = requests.post(
+                        "https://api.stability.ai/v2beta/stable-image/generate/sd3",
+                        headers={
+                            "authorization": "Bearer sk-MYAPIKEY", # تأكد من وضع مفتاحك هنا
+                            "accept": "image/*"
+                        },
+                        files={"none": ''},
+                        data={
+                            "prompt": user_prompt,
+                            "output_format": "jpeg",
+                        },
+                    )
 
-
-
-# داخل كود الـ Tab الخاص بك
-with model_tab: # افترضنا أن اسم التبويب هو tab_3d
-    st.header("Generate a 3D Photo ")
-    response = requests.post(
-    f"https://api.stability.ai/v2beta/stable-image/generate/sd3",
-    headers={
-        "authorization": f"Bearer sk-MYAPIKEY",
-        "accept": "image/*"
-    },
-    files={"none": ''},
-    data={
-        "prompt": "Lighthouse on a cliff overlooking the ocean",
-        "output_format": "jpeg",
-    },
-)
-
-if response.status_code == 200:
-    with open("./lighthouse.jpeg", 'wb') as file:
-        file.write(response.content)
-else:
-    raise Exception(str(response.json()))
+                    # 4. معالجة النتيجة
+                    if response.status_code == 200:
+                        image = Image.open(io.BytesIO(response.content))
+                        st.image(image, caption="تم توليد الصورة بنجاح!")
+                    else:
+                        # عرض الخطأ من السيرفر بدون إيقاف التطبيق
+                        st.error(f"حدث خطأ: {response.status_code} - {response.text}")
+                        
+                except Exception as e:
+                    st.error(f"حدث خطأ أثناء الاتصال: {e}")
 
 # --- CSS المحدث والمحسن ---
 st.markdown("""
