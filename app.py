@@ -325,171 +325,46 @@ with model_tab:
                 st.image(image_url, caption=f"نتائج البحث عن: {user_prompt}", use_container_width=True)
         else:
             st.warning("من فضلك اكتب اسم الشيء أولاً!")
-# --- CUSTOM CSS FOR PREMIUM LOOK ---
+# --- CUSTOM CSS FOR PREMIUM LOOK AND TEXT COLOR ---
 st.markdown("""
     <style>
-    /* 1. الخلفية العامة للتطبيق (تدرج لوني غامق ومريح للعين) */
+    /* 1. الخلفية العامة للتطبيق */
     .stApp {
         background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%) !important;
-        color: #f8fafc !important;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     
-    /* 2. تحسين مظهر العناوين والنصوص */
-    h1, h2, h3, .stSubheader {
-        color: #ffffff !important;
-        font-weight: 700 !important;
-        text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+    /* 2. فرض اللون الأبيض الناصع على كافة النصوص في التطبيق */
+    div, p, label, span, li, h1, h2, h3, h4, h5, h6, 
+    .stTextInput input, .stTextArea textarea, 
+    [data-testid="stChatMessage"] div, 
+    [data-testid="stMarkdownContainer"], 
+    div[role="radiogroup"] label {
+        color: #FFFFFF !important;
     }
     
-    /* 3. تعديل شكل الـ Tabs بالكامل لتصبح كأزرار مودرن */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 12px;
-        background-color: rgba(255, 255, 255, 0.04) !important;
-        padding: 8px 12px !important;
-        border-radius: 16px !important;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        margin-bottom: 20px;
-    }
-    .stTabs [data-baseweb="tab"] {
-        color: #94a3b8 !important;
-        background-color: transparent !important;
-        border-radius: 10px !important;
-        padding: 10px 20px !important;
-        font-weight: 600 !important;
-        transition: all 0.3s ease-in-out;
-    }
-    /* الـ Tab النشط حالياً */
-    .stTabs [aria-selected="true"] {
-        background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%) !important;
-        color: #ffffff !important;
-        box-shadow: 0px 4px 12px rgba(124, 58, 237, 0.4) !important;
-    }
-    
-    /* 4. تجميل الأزرار (Buttons) وإضافة تأثير حركي عند الإشارة (Hover) */
+    /* 3. تنسيق الأزرار */
     .stButton>button {
         background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%) !important;
-        color: #ffffff !important;
+        color: #FFFFFF !important;
         border: none !important;
-        padding: 12px 28px !important;
         border-radius: 12px !important;
-        font-weight: bold !important;
-        font-size: 16px !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3) !important;
-        width: auto;
-    }
-    .stButton>button:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 6px 22px rgba(124, 58, 237, 0.6) !important;
-        background: linear-gradient(90deg, #5a52ff 0%, #8b4aff 100%) !important;
-    }
-    .stButton>button:active {
-        transform: translateY(1px) !important;
-    }
-    
-    /* 5. تحسين حقول الإدخال والقوائم (Inputs & Selectboxes) */
-    .stTextInput input, .stTextArea textarea, .stSelectbox select, .stNumberInput input {
-        background-color: #1e293b !important;
-        color: #f8fafc !important;
-        border: 1px solid #334155 !important;
-        border-radius: 12px !important;
-        padding: 10px !important;
-        transition: border 0.3s ease;
-    }
-    .stTextInput input:focus, .stTextArea textarea:focus {
-        border-color: #7c3aed !important;
-        box-shadow: 0 0 0 1px #7c3aed !important;
-    }
-    
-    /* 6. تجميل الصناديق التنبيهية (Alerts & Success Messages) */
-    .stAlert {
-        border-radius: 14px !important;
-        background-color: #1e293b !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    }
-    
-    /* 7. تجميل الرسائل داخل الـ Chat */
-    [data-testid="stChatMessage"] {
-        background-color: rgba(30, 41, 59, 0.7) !important;
-        border-radius: 16px !important;
-        margin-bottom: 10px !important;
-        border: 1px solid rgba(255, 255, 255, 0.05) !important;
-    .stApp {
-        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%) !important;
-        color: #f8fafc !important;
-        font-size: 18px !important; /* زيادة حجم الخط الأساسي */
-    }
-    
-    /* تكبير خط الأزرار */
-    .stButton>button {
-        font-size: 18px !important; 
-        font-weight: 600 !important;
+        font-size: 18px !important;
         padding: 15px 30px !important;
     }
     
-    /* تحسين النصوص داخل التطبيق */
-    p, label, div {
-        font-size: 18px !important;
-    }
-    
-    /* تحسين حجم الخط في الـ Tabs */
+    /* 4. تنسيق الـ Tabs */
     .stTabs [data-baseweb="tab"] {
+        color: #94a3b8 !important;
         font-size: 16px !important;
-        font-weight: 700 !important;0
-    .stApp, .stApp div, .stApp p, .stApp span, .stApp li {
+    }
+    .stTabs [aria-selected="true"] {
         color: #FFFFFF !important;
     }
     
-    /* تغيير لون نص رسائل الشات (سواء المستخدم أو البوت) */
-    [data-testid="stChatMessage"] div, [data-testid="stChatMessage"] p {
-        color: #FFFFFF !important;
-    }
-    
-    /* تحسين لون حقول الإدخال */
+    /* 5. تحسين خلفية مدخلات النص */
     .stTextInput input, .stTextArea textarea {
-        color: #FFFFFF !important;
-        background-color: #262730 !important;
-    }
-    
-    /* تحسين لون العناوين */
-    h1, h2, h3, h4, h5, h6 {
-        color: #FFFFFF !important;
-    }
-    
-    /* تحسين لون التنبيهات */
-    .stAlert div {
-        color: #FFFFFF !important;
-    .stApp, div, p, label, .stRadio label, .stTextInput input, .stTextArea textarea {
-        color: #FFFFFF !important;
-    }
-
-    /* ضمان ظهور نصوص الأسئلة والاختيارات بشكل واضح */
-    [data-testid="stMarkdownContainer"] {
-        color: #FFFFFF !important;
-    }
-    
-    /* تغيير لون الخط داخل الـ Quiz تحديداً */
-    .stForm label {
-        color: #FFFFFF !important;
-    }
-    
-    /* تنسيق خاص للـ Selectbox والـ Radio ليظهر الخط أبيض */
-    div[role="radiogroup"] label {
-        color: #FFFFFF !important;
-    }
-    .stApp, .stApp div, .stApp p, .stApp span, .stApp label, .stApp li, .stApp h1, .stApp h2, .stApp h3 {
-        color: #FFFFFF !important;
-    }
-    
-    /* تغيير لون نصوص رسائل الشات */
-    [data-testid="stChatMessage"] div {
-        color: #FFFFFF !important;
-    }
-    
-    /* تغيير لون النصوص داخل الـ Quiz */
-    div[role="radiogroup"] label {
-        color: #FFFFFF !important;
+        background-color: #1e293b !important;
+        border: 1px solid #334155 !important;
     }
     </style>
 """, unsafe_allow_html=True)
