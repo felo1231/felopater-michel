@@ -118,8 +118,8 @@ if not st.session_state.logged_in:
 
 
 # --- APP TABS ---
-questions_tab, quizzes_tab, planner_tab, account_tab = st.tabs(
-    ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅', 'Account 👤'])
+questions_tab, quizzes_tab, planner_tab, account_tab, model_tab = st.tabs(
+    ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅', 'Account 👤'],['3D Models 🎨'])
 
 # --- 4. QUESTIONS TAB ---
 with questions_tab:
@@ -179,7 +179,7 @@ with quizzes_tab:
         )
 
     with col_q2:
-        num_q = st.slider("Number of Questions:", 1, 10, 3)
+        num_q = st.slider("Number of Questions:", 1, 20, 5)
         difficulty = st.select_slider("Style:", options=["Basic", "mediam", "Challenge"])
 
     if st.button("Generate My Quiz 📝"):
@@ -304,3 +304,143 @@ with account_tab:
             pass
             
         st.rerun()
+
+with model_tab:
+    st.header("🎨 Generate Your Photo On 3D Model")
+    st.write("اكتب وصفاً لأي شيء تريد تخيله كمجسم ثلاثي الأبعاد أو مشهد مجسم، وسيقوم التطبيق بتوليد الفكرة وعرضها لك!")
+
+    # خانة إدخال النص للمستخدم
+    user_prompt = st.text_input(
+        "أدخل وصف الصورة أو المجسم المُراد توليده:", 
+        placeholder="مثال: A futuristic drone, 3d asset, isometric, blender render, highly detailed"
+    )
+
+    # زر التوليد بالاسم المطلوب تماماً
+    if st.button("generate 3d photo"):
+        if user_prompt:
+            with st.spinner("جاري التفكير وتوليد المشهد ثلاثي الأبعاد... 🚀"):
+                # نطلب من جيميناي تحليل وتوسيع فكرة المستخدم ليعطينا فكرة فنية مذهلة للمجسم
+                ai_prompt = f"""
+                Act as a 3D artist and conceptual designer. 
+                Provide a brilliant, detailed structural description and artistic review for a 3D model of: '{user_prompt}'.
+                Mention details like textures, materials (e.g., metallic, glass, matte), lighting setup, and environment.
+                Keep the response clear and inspiring.
+                """
+                try:
+                    # توليد التحليل النصي للمجسم
+                    response = model.generate_content(ai_prompt)
+                    
+                    st.subheader("💡 المفهوم الفني للمجسم (3D Concept Breakdown):")
+                    st.markdown(response.text)
+                    
+                    st.divider()
+                    st.subheader("🖼️ المعاينة المرئية التخيلية (Visual Preview):")
+                    
+                    # هندسة النص لتوليد ستايل ثلاثي الأبعاد مبهر في الرابط
+                    enhanced_search_prompt = f"{user_prompt}, 3d model, detailed render, unreal engine 5, cinematic lighting"
+                    encoded_prompt = enhanced_search_prompt.replace(" ", "%20")
+                    
+                    # استخدام محرك توليد الصور الفوري والمجاني لعرض النتيجة للمستخدم مباشرة
+                    image_url = f"https://image.pollinations.ai/p/{encoded_prompt}?width=800&height=600&enhance=true"
+                    
+                    # عرض الصورة الناتجة في التطبيق
+                    st.image(image_url, caption=f"رؤية ثلاثية الأبعاد تخيلية لـ: {user_prompt}", use_container_width=True)
+                    
+                except Exception as e:
+                    st.error("عذراً، حدث خطأ أثناء الاتصال أو توليد الصورة. يرجى المحاولة مرة أخرى.")
+        else:
+            st.warning("من فضلك اكتب الوصف أولاً في الخانة المخصصة قبل الضغط على الزر! ⚠️")
+
+# --- CUSTOM CSS FOR PREMIUM LOOK ---
+st.markdown("""
+    <style>
+    /* 1. الخلفية العامة للتطبيق (تدرج لوني غامق ومريح للعين) */
+    .stApp {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%) !important;
+        color: #f8fafc !important;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    /* 2. تحسين مظهر العناوين والنصوص */
+    h1, h2, h3, .stSubheader {
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* 3. تعديل شكل الـ Tabs بالكامل لتصبح كأزرار مودرن */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 12px;
+        background-color: rgba(255, 255, 255, 0.04) !important;
+        padding: 8px 12px !important;
+        border-radius: 16px !important;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 20px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        color: #94a3b8 !important;
+        background-color: transparent !important;
+        border-radius: 10px !important;
+        padding: 10px 20px !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease-in-out;
+    }
+    /* الـ Tab النشط حالياً */
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%) !important;
+        color: #ffffff !important;
+        box-shadow: 0px 4px 12px rgba(124, 58, 237, 0.4) !important;
+    }
+    
+    /* 4. تجميل الأزرار (Buttons) وإضافة تأثير حركي عند الإشارة (Hover) */
+    .stButton>button {
+        background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%) !important;
+        color: #ffffff !important;
+        border: none !important;
+        padding: 12px 28px !important;
+        border-radius: 12px !important;
+        font-weight: bold !important;
+        font-size: 16px !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3) !important;
+        width: auto;
+    }
+    .stButton>button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 22px rgba(124, 58, 237, 0.6) !important;
+        background: linear-gradient(90deg, #5a52ff 0%, #8b4aff 100%) !important;
+    }
+    .stButton>button:active {
+        transform: translateY(1px) !important;
+    }
+    
+    /* 5. تحسين حقول الإدخال والقوائم (Inputs & Selectboxes) */
+    .stTextInput input, .stTextArea textarea, .stSelectbox select, .stNumberInput input {
+        background-color: #1e293b !important;
+        color: #f8fafc !important;
+        border: 1px solid #334155 !important;
+        border-radius: 12px !important;
+        padding: 10px !important;
+        transition: border 0.3s ease;
+    }
+    .stTextInput input:focus, .stTextArea textarea:focus {
+        border-color: #7c3aed !important;
+        box-shadow: 0 0 0 1px #7c3aed !important;
+    }
+    
+    /* 6. تجميل الصناديق التنبيهية (Alerts & Success Messages) */
+    .stAlert {
+        border-radius: 14px !important;
+        background-color: #1e293b !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    /* 7. تجميل الرسائل داخل الـ Chat */
+    [data-testid="stChatMessage"] {
+        background-color: rgba(30, 41, 59, 0.7) !important;
+        border-radius: 16px !important;
+        margin-bottom: 10px !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
