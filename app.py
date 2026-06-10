@@ -358,7 +358,7 @@ st.markdown("""
     
     /* تغيير لون السهم في القائمة المنسدلة */
     div[data-baseweb="select"] svg {
-        fill: #FFFFFF !important;
+        fill: #a984d9 !important;
     }
 
     /* 4. تنسيق خيارات الـ Radio (الكويز) */
