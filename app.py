@@ -354,7 +354,7 @@ st.markdown("""
     /* 5. تنسيق الـ Text Inputs */
     .stTextInput input, .stTextArea textarea {
         background-color: #a984d9 !important;
-        color: #ffffff !important;
+        color: #000000 !important;
         border: 1px solid #475569 !important;
     }
     </style>
