@@ -309,22 +309,7 @@ with account_tab:
 
 with model_tab:
     st.header("🎨 Generate Your Photo On 3D Model")
-    
-    user_prompt = st.text_input("أدخل وصف الشيء الذي تريده:", placeholder="مثال: plant")
 
-    if st.button("generate 3d photo"):
-        if user_prompt:
-            with st.spinner("جاري الإبداع..."):
-                # تحسين الوصف لضمان ظهور النتيجة
-                enhanced_prompt = f"a high quality 3d model render of {user_prompt}, cinematic lighting, 8k, detailed texture"
-                
-                # استخدام رابط التوليد مع الوصف المحسن
-                encoded_prompt = enhanced_prompt.replace(" ", "%20")
-                image_url = f"https://image.pollinations.ai/p/{encoded_prompt}?width=800&height=600&nologo=true"
-                
-                st.image(image_url, caption=f"نتائج البحث عن: {user_prompt}", use_container_width=True)
-        else:
-            st.warning("من فضلك اكتب اسم الشيء أولاً!")
 
 # --- CSS المحدث والمحسن ---
 st.markdown("""
@@ -346,7 +331,7 @@ st.markdown("""
     /* تغيير لون خلفية المربع ونص المربع نفسه */
     div[data-baseweb="select"] > div {
         background-color: #a984d9 !important;
-        border: 1px solid #475569 !important;
+        border: 1px solid #a984d9 !important;
         color: #a984d9 !important;
     }
     
