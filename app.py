@@ -347,7 +347,7 @@ st.markdown("""
     div[data-baseweb="select"] > div {
         background-color: #a984d9 !important;
         border: 1px solid #475569 !important;
-        color: #000000 !important;
+        color: #a984d9 !important;
     }
     
     /* تغيير لون النص داخل القائمة عند فتحها */
