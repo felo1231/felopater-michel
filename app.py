@@ -118,9 +118,10 @@ if not st.session_state.logged_in:
 
 
 # --- APP TABS ---
+# التصحيح: قائمة واحدة تحتوي على كل العناصر
 questions_tab, quizzes_tab, planner_tab, account_tab, model_tab = st.tabs(
-    ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅', 'Account 👤'],['3D Models 🎨'])
-
+    ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅', 'Account 👤', '3D Models 🎨']
+)
 # --- 4. QUESTIONS TAB ---
 with questions_tab:
     col1, col2 = st.columns(2)
