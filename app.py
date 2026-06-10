@@ -358,12 +358,12 @@ st.markdown("""
     
     /* تغيير لون السهم في القائمة المنسدلة */
     div[data-baseweb="select"] svg {
-        fill: #a984d9 !important;
+        fill: #FFFFFF !important;
     }
 
     /* 4. تنسيق خيارات الـ Radio (الكويز) */
     div[role="radiogroup"] label {
-        color: #FFFFFF !important;
+        color: #a984d9 !important;
     }
 
     /* 5. تنسيق الـ Text Inputs */
