@@ -118,10 +118,11 @@ if not st.session_state.logged_in:
 
 
 # --- APP TABS ---
-# التصحيح: قائمة واحدة تحتوي على كل العناصر
+# الصحيح: قائمة واحدة تضم كل الـ Tabs
 questions_tab, quizzes_tab, planner_tab, account_tab, model_tab = st.tabs(
     ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅', 'Account 👤', '3D Models 🎨']
 )
+
 # --- 4. QUESTIONS TAB ---
 with questions_tab:
     col1, col2 = st.columns(2)
@@ -436,6 +437,29 @@ st.markdown("""
     .stTabs [data-baseweb="tab"] {
         font-size: 16px !important;
         font-weight: 700 !important;0
+    .stApp, .stApp div, .stApp p, .stApp span, .stApp li {
+        color: #FFFFFF !important;
+    }
+    
+    /* تغيير لون نص رسائل الشات (سواء المستخدم أو البوت) */
+    [data-testid="stChatMessage"] div, [data-testid="stChatMessage"] p {
+        color: #FFFFFF !important;
+    }
+    
+    /* تحسين لون حقول الإدخال */
+    .stTextInput input, .stTextArea textarea {
+        color: #FFFFFF !important;
+        background-color: #262730 !important;
+    }
+    
+    /* تحسين لون العناوين */
+    h1, h2, h3, h4, h5, h6 {
+        color: #FFFFFF !important;
+    }
+    
+    /* تحسين لون التنبيهات */
+    .stAlert div {
+        color: #FFFFFF !important;
     }
     </style>
 """, unsafe_allow_html=True)
