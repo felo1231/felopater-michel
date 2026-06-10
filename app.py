@@ -336,7 +336,7 @@ st.markdown("""
 
     /* 2. فرض اللون الأبيض على كافة النصوص والعناوين */
     h1, h2, h3, h4, p, label, div, span, li {
-        color: #e551f0 !important;
+        color: #FFFFFF !important;
     }
 
     /* 3. حل مشكلة الـ Selectbox (القائمة المنسدلة) - هذا هو الأهم */
@@ -366,7 +366,7 @@ st.markdown("""
     /* 5. تنسيق الـ Text Inputs */
     .stTextInput input, .stTextArea textarea {
         background-color: #1e293b !important;
-        color: #FFFFFF !important;
+        color: #5e5ee0 !important;
         border: 1px solid #475569 !important;
     }
     </style>
