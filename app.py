@@ -363,13 +363,13 @@ st.markdown("""
 
     /* 4. تنسيق خيارات الـ Radio (الكويز) */
     div[role="radiogroup"] label {
-        color: #a984d9 !important;
+        color: #FFFFFF !important;
     }
 
     /* 5. تنسيق الـ Text Inputs */
     .stTextInput input, .stTextArea textarea {
         background-color: #1e293b !important;
-        color: #f7f7f5 !important;
+        color: #000000 !important;
         border: 1px solid #475569 !important;
     }
     </style>
