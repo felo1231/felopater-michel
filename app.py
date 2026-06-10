@@ -338,7 +338,7 @@ st.markdown("""
     div{
         color: #000000 !important;
     }
-    h1, h2, h3, h4, label, p, span {
+    h1, h2, h3, h4, label, p, l1 {
         color: #ffffff !important;
     }
 
