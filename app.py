@@ -345,7 +345,7 @@ st.markdown("""
     /* 3. حل مشكلة الـ Selectbox (القائمة المنسدلة) - هذا هو الأهم */
     /* تغيير لون خلفية المربع ونص المربع نفسه */
     div[data-baseweb="select"] > div {
-        background-color: #1e293b !important;
+        background-color: #a984d9 !important;
         border: 1px solid #475569 !important;
         color: #000000 !important;
     }
