@@ -339,7 +339,7 @@ st.markdown("""
         color: #000000 !important;
     }
     h1, h2, h3, h4, label, p, span, l1 {
-        color: #000000 !important;
+        color: #ffffff !important;
     }
 
     /* 3. حل مشكلة الـ Selectbox (القائمة المنسدلة) - هذا هو الأهم */
@@ -358,7 +358,7 @@ st.markdown("""
     
     /* تغيير لون السهم في القائمة المنسدلة */
     div[data-baseweb="select"] svg {
-        fill: #FFFFFF !important;
+        fill: #000000 !important;
     }
 
     /* 4. تنسيق خيارات الـ Radio (الكويز) */
