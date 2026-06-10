@@ -335,7 +335,7 @@ st.markdown("""
     }
 
     /* 2. فرض اللون الأبيض على كافة النصوص والعناوين */
-    h1, h2, h3, h4, p, label, span, li {
+    h1, h2, h3, h4, p, label, div, span, li {
         color: #FFFFFF !important;
     }
 
@@ -344,7 +344,7 @@ st.markdown("""
     div[data-baseweb="select"] > div {
         background-color: #1e293b !important;
         border: 1px solid #475569 !important;
-        color: #FFFFFF !important;
+        color: #000000 !important;
     }
     
     /* تغيير لون النص داخل القائمة عند فتحها */
