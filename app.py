@@ -343,17 +343,17 @@ st.markdown("""
     
     /* تغيير لون السهم في القائمة المنسدلة */
     div[data-baseweb="select"] svg {
-        fill: #474f5c !important;
+        fill: 457465 !important;
     }
 
     /* 4. تنسيق خيارات الـ Radio (الكويز) */
     div[role="radiogroup"] label {
-        color: #FFFFFF !important;
+        color: 457465 !important;
     }
 
     /* 5. تنسيق الـ Text Inputs */
     .stTextInput input, .stTextArea textarea {
-        background-color: #1e293b !important;
+        background-color: 457465 !important;
         color: #ffffff !important;
         border: 1px solid #475569 !important;
     }
