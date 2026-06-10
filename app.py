@@ -336,7 +336,7 @@ st.markdown("""
 
     /* 2. فرض اللون الأبيض على كافة النصوص والعناوين */
     h1, h2, h3, h4, p, label, div, span, li {
-        color: #FFFFFF !important;
+        color: #e551f0 !important;
     }
 
     /* 3. حل مشكلة الـ Selectbox (القائمة المنسدلة) - هذا هو الأهم */
@@ -344,7 +344,7 @@ st.markdown("""
     div[data-baseweb="select"] > div {
         background-color: #1e293b !important;
         border: 1px solid #475569 !important;
-        color: #e551f0 !important;
+        color: #FFFFFF !important;
     }
     
     /* تغيير لون النص داخل القائمة عند فتحها */
