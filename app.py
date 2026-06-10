@@ -11,6 +11,54 @@ import requests
 import io
 from PIL import Image
 
+st.markdown("""
+    <style>
+    /* 1. الخلفية العامة */
+    .stApp {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%) !important;
+    }
+
+    /* 2. فرض اللون الأبيض على كافة النصوص والعناوين */
+    div{
+        color: #000000 !important;
+    }
+    h1, h2, h3, h4, label, p, span, l1 {
+        color: #ffffff !important;
+    }
+
+    /* 3. حل مشكلة الـ Selectbox (القائمة المنسدلة) - هذا هو الأهم */
+    /* تغيير لون خلفية المربع ونص المربع نفسه */
+    div[data-baseweb="select"] > div {
+        background-color: #a984d9 !important;
+        border: 1px solid #a984d9 !important;
+        color: #a984d9 !important;
+    }
+    
+    /* تغيير لون النص داخل القائمة عند فتحها */
+    div[role="listbox"] div {
+        background-color: #1e293b !important;
+        color: #000000 !important;
+    }
+    
+    /* تغيير لون السهم في القائمة المنسدلة */
+    div[data-baseweb="select"] svg {
+        fill: #a984d9 !important;
+    }
+
+    /* 4. تنسيق خيارات الـ Radio (الكويز) */
+    div[role="radiogroup"] label {
+        color: #a984d9 !important;
+    }
+
+    /* 5. تنسيق الـ Text Inputs */
+    .stTextInput input, .stTextArea textarea {
+        background-color: #a984d9 !important;
+        color: #000000 !important;
+        border: 1px solid #475569 !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 # --- APP CONFIG & SETUP ---
 st.set_page_config(page_title="AI Study Assistant", layout="wide")
 st.title('AI Studying Assistant✨')
@@ -293,87 +341,22 @@ with planner_tab:
 # --- 8. 3D MODELS TAB (تم تعديل الكود هنا) ---
 with model_tab:
     st.header("Generate a 3D Photo 🎨")
-    
-    # 1. إدخال النص من المستخدم
-    user_prompt = st.text_input("اكتب وصفاً للصورة التي تريدها:", placeholder="مثال: Lighthouse on a cliff")
-    
-    # 2. زر التنفيذ
-    if st.button("Generate 3D Photo"):
-        if not user_prompt:
-            st.warning("يرجى كتابة وصف أولاً!")
-        else:
-            with st.spinner("جاري الاتصال بـ Stability AI..."):
-                try:
-                    # 3. تنفيذ الطلب
-                    response = requests.post(
-                        "https://api.stability.ai/v2beta/stable-image/generate/sd3",
-                        headers={
-                            "authorization": "Bearer sk-MYAPIKEY", # تأكد من وضع مفتاحك هنا
-                            "accept": "image/*"
-                        },
-                        files={"none": ''},
-                        data={
-                            "prompt": user_prompt,
-                            "output_format": "jpeg",
-                        },
-                    )
+    re = requests.post(
+        f"https://api.stability.ai/v2beta/stable-image/generate/sd3",
+        headers={
+            "authorization": f"Bearer sk-MYAPIKEY",
+            "accept": "image/*"
+        },
+        files={"none": ''},
+        data={
+            "prompt": "Lighthouse on a cliff overlooking the ocean",
+            "output_format": "jpeg",
+        },
+    )
 
-                    # 4. معالجة النتيجة
-                    if response.status_code == 200:
-                        image = Image.open(io.BytesIO(response.content))
-                        st.image(image, caption="تم توليد الصورة بنجاح!")
-                    else:
-                        # عرض الخطأ من السيرفر بدون إيقاف التطبيق
-                        st.error(f"حدث خطأ: {response.status_code} - {response.text}")
-                        
-                except Exception as e:
-                    st.error(f"حدث خطأ أثناء الاتصال: {e}")
+    if re.status_code == 200:
+        with open("./lighthouse.jpeg", 'wb') as file:
+            file.write(re.content)
+    else:
+        raise Exception(str(re.json()))
 
-# --- CSS المحدث والمحسن ---
-st.markdown("""
-    <style>
-    /* 1. الخلفية العامة */
-    .stApp {
-        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%) !important;
-    }
-
-    /* 2. فرض اللون الأبيض على كافة النصوص والعناوين */
-    div{
-        color: #000000 !important;
-    }
-    h1, h2, h3, h4, label, p, span, l1 {
-        color: #ffffff !important;
-    }
-
-    /* 3. حل مشكلة الـ Selectbox (القائمة المنسدلة) - هذا هو الأهم */
-    /* تغيير لون خلفية المربع ونص المربع نفسه */
-    div[data-baseweb="select"] > div {
-        background-color: #a984d9 !important;
-        border: 1px solid #a984d9 !important;
-        color: #a984d9 !important;
-    }
-    
-    /* تغيير لون النص داخل القائمة عند فتحها */
-    div[role="listbox"] div {
-        background-color: #1e293b !important;
-        color: #000000 !important;
-    }
-    
-    /* تغيير لون السهم في القائمة المنسدلة */
-    div[data-baseweb="select"] svg {
-        fill: #a984d9 !important;
-    }
-
-    /* 4. تنسيق خيارات الـ Radio (الكويز) */
-    div[role="radiogroup"] label {
-        color: #a984d9 !important;
-    }
-
-    /* 5. تنسيق الـ Text Inputs */
-    .stTextInput input, .stTextArea textarea {
-        background-color: #a984d9 !important;
-        color: #000000 !important;
-        border: 1px solid #475569 !important;
-    }
-    </style>
-""", unsafe_allow_html=True)
