@@ -338,26 +338,3 @@ with planner_tab:
         else:
             st.warning("Tell me what you want to learn!")
 
-# --- 8. 3D MODELS TAB (تم تعديل الكود هنا) ---
-with model_tab:
-    api_image_key = st.secrets["image_api_key"]
-    st.header("Generate a 3D Photo 🎨")
-    re = requests.post(
-        f"https://api.stability.ai/v2beta/stable-image/generate/sd3",
-        headers={
-            "authorization": f"{api_image_key}",
-            "accept": "image/*"
-        },
-        files={"none": ''},
-        data={
-            "prompt": "Lighthouse on a cliff overlooking the ocean",
-            "output_format": "jpeg",
-        },
-    )
-
-    if re.status_code == 200:
-        with open("./lighthouse.jpeg", 'wb') as file:
-            file.write(re.content)
-    else:
-        raise Exception(str(re.json()))
-
