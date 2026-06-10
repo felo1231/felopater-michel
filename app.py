@@ -335,10 +335,10 @@ st.markdown("""
     }
 
     /* 2. فرض اللون الأبيض على كافة النصوص والعناوين */
-     p{
+    div{
         color: #000000 !important;
     }
-    h1, h2, h3, h4, label, div, span, l1 {
+    h1, h2, h3, h4, label, p, span, l1 {
         color: #ffffff !important;
     }
 
