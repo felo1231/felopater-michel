@@ -460,6 +460,24 @@ st.markdown("""
     /* تحسين لون التنبيهات */
     .stAlert div {
         color: #FFFFFF !important;
+    .stApp, div, p, label, .stRadio label, .stTextInput input, .stTextArea textarea {
+        color: #FFFFFF !important;
+    }
+
+    /* ضمان ظهور نصوص الأسئلة والاختيارات بشكل واضح */
+    [data-testid="stMarkdownContainer"] {
+        color: #FFFFFF !important;
+    }
+    
+    /* تغيير لون الخط داخل الـ Quiz تحديداً */
+    .stForm label {
+        color: #FFFFFF !important;
+    }
+    
+    /* تنسيق خاص للـ Selectbox والـ Radio ليظهر الخط أبيض */
+    div[role="radiogroup"] label {
+        color: #FFFFFF !important;
+    }
     }
     </style>
 """, unsafe_allow_html=True)
