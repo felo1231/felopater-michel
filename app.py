@@ -350,7 +350,7 @@ st.markdown("""
     /* تغيير لون النص داخل القائمة عند فتحها */
     div[role="listbox"] div {
         background-color: #1e293b !important;
-        color: #FFFFFF !important;
+        color: #000000 !important;
     }
     
     /* تغيير لون السهم في القائمة المنسدلة */
@@ -360,7 +360,7 @@ st.markdown("""
 
     /* 4. تنسيق خيارات الـ Radio (الكويز) */
     div[role="radiogroup"] label {
-        color: #000000 !important;
+        color: #FFFFFF !important;
     }
 
     /* 5. تنسيق الـ Text Inputs */
