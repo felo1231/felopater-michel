@@ -334,28 +334,33 @@ st.markdown("""
         background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%) !important;
     }
 
-    /* 2. فرض اللون الأبيض على كافة النصوص */
-    div, p, label, span, li, h1, h2, h3, h4, h5, h6 {
+    /* 2. فرض اللون الأبيض على كافة النصوص والعناوين */
+    h1, h2, h3, h4, p, label, div, span, li {
         color: #FFFFFF !important;
     }
 
-    /* 3. حل مشكلة الـ Selectbox والـ Dropdown */
-    /* خلفية القائمة المنسدلة نفسها */
+    /* 3. حل مشكلة الـ Selectbox (القائمة المنسدلة) - هذا هو الأهم */
+    /* تغيير لون خلفية المربع ونص المربع نفسه */
     div[data-baseweb="select"] > div {
         background-color: #1e293b !important;
         border: 1px solid #475569 !important;
         color: #FFFFFF !important;
     }
-    /* نص العناصر داخل القائمة */
-    div[role="option"] {
+    
+    /* تغيير لون النص داخل القائمة عند فتحها */
+    div[role="listbox"] div {
         background-color: #1e293b !important;
         color: #FFFFFF !important;
     }
+    
+    /* تغيير لون السهم في القائمة المنسدلة */
+    div[data-baseweb="select"] svg {
+        fill: #FFFFFF !important;
+    }
 
-    /* 4. تنسيق الـ Radio Buttons (خيارات الكويز) */
+    /* 4. تنسيق خيارات الـ Radio (الكويز) */
     div[role="radiogroup"] label {
         color: #FFFFFF !important;
-        font-size: 18px !important;
     }
 
     /* 5. تنسيق الـ Text Inputs */
@@ -363,14 +368,6 @@ st.markdown("""
         background-color: #1e293b !important;
         color: #FFFFFF !important;
         border: 1px solid #475569 !important;
-    }
-
-    /* 6. تنسيق الأزرار */
-    .stButton>button {
-        background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%) !important;
-        color: #FFFFFF !important;
-        border: none !important;
-        border-radius: 10px !important;
     }
     </style>
 """, unsafe_allow_html=True)
