@@ -7,6 +7,9 @@ import random
 from streamlit_cookies_controller import CookieController
 from email_validator import validate_email, EmailNotValidError
 import typing_extensions as typing
+import requests
+import io
+from PIL import Image
 
 # --- APP CONFIG & SETUP ---
 st.set_page_config(page_title="AI Study Assistant", layout="wide")
@@ -25,7 +28,7 @@ try:
 except Exception as e:
     st.error("خطأ في إعدادات الاتصال: تأكد من إضافة GEMINI_API_KEY في إعدادات التطبيق.")
     st.stop()
-    
+
 
 # --- AUTHENTICATION & LOGIN CHECK ---
 OFFICIAL_EMAIL = "ai.studying.assisstant@gmail.com"
@@ -307,9 +310,29 @@ with account_tab:
             
         st.rerun()
 
-with model_tab:
-    st.header("🎨 Generate Your Photo On 3D Model")
 
+
+# داخل كود الـ Tab الخاص بك
+with model_tab: # افترضنا أن اسم التبويب هو tab_3d
+    st.header("Generate a 3D Photo ")
+    response = requests.post(
+    f"https://api.stability.ai/v2beta/stable-image/generate/sd3",
+    headers={
+        "authorization": f"Bearer sk-MYAPIKEY",
+        "accept": "image/*"
+    },
+    files={"none": ''},
+    data={
+        "prompt": "Lighthouse on a cliff overlooking the ocean",
+        "output_format": "jpeg",
+    },
+)
+
+if response.status_code == 200:
+    with open("./lighthouse.jpeg", 'wb') as file:
+        file.write(response.content)
+else:
+    raise Exception(str(response.json()))
 
 # --- CSS المحدث والمحسن ---
 st.markdown("""
