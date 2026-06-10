@@ -478,6 +478,18 @@ st.markdown("""
     div[role="radiogroup"] label {
         color: #FFFFFF !important;
     }
+    .stApp, .stApp div, .stApp p, .stApp span, .stApp label, .stApp li, .stApp h1, .stApp h2, .stApp h3 {
+        color: #FFFFFF !important;
+    }
+    
+    /* تغيير لون نصوص رسائل الشات */
+    [data-testid="stChatMessage"] div {
+        color: #FFFFFF !important;
+    }
+    
+    /* تغيير لون النصوص داخل الـ Quiz */
+    div[role="radiogroup"] label {
+        color: #FFFFFF !important;
     }
     </style>
 """, unsafe_allow_html=True)
