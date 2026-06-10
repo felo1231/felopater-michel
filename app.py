@@ -325,46 +325,52 @@ with model_tab:
                 st.image(image_url, caption=f"نتائج البحث عن: {user_prompt}", use_container_width=True)
         else:
             st.warning("من فضلك اكتب اسم الشيء أولاً!")
-# --- CUSTOM CSS FOR PREMIUM LOOK AND TEXT COLOR ---
+
+# --- CSS المحدث والمحسن ---
 st.markdown("""
     <style>
-    /* 1. الخلفية العامة للتطبيق */
+    /* 1. الخلفية العامة */
     .stApp {
         background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%) !important;
     }
-    
-    /* 2. فرض اللون الأبيض الناصع على كافة النصوص في التطبيق */
-    div, p, label, span, li, h1, h2, h3, h4, h5, h6, 
-    .stTextInput input, .stTextArea textarea, 
-    [data-testid="stChatMessage"] div, 
-    [data-testid="stMarkdownContainer"], 
-    div[role="radiogroup"] label {
+
+    /* 2. فرض اللون الأبيض على كافة النصوص */
+    div, p, label, span, li, h1, h2, h3, h4, h5, h6 {
         color: #FFFFFF !important;
     }
-    
-    /* 3. تنسيق الأزرار */
+
+    /* 3. حل مشكلة الـ Selectbox والـ Dropdown */
+    /* خلفية القائمة المنسدلة نفسها */
+    div[data-baseweb="select"] > div {
+        background-color: #1e293b !important;
+        border: 1px solid #475569 !important;
+        color: #FFFFFF !important;
+    }
+    /* نص العناصر داخل القائمة */
+    div[role="option"] {
+        background-color: #1e293b !important;
+        color: #FFFFFF !important;
+    }
+
+    /* 4. تنسيق الـ Radio Buttons (خيارات الكويز) */
+    div[role="radiogroup"] label {
+        color: #FFFFFF !important;
+        font-size: 18px !important;
+    }
+
+    /* 5. تنسيق الـ Text Inputs */
+    .stTextInput input, .stTextArea textarea {
+        background-color: #1e293b !important;
+        color: #FFFFFF !important;
+        border: 1px solid #475569 !important;
+    }
+
+    /* 6. تنسيق الأزرار */
     .stButton>button {
         background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%) !important;
         color: #FFFFFF !important;
         border: none !important;
-        border-radius: 12px !important;
-        font-size: 18px !important;
-        padding: 15px 30px !important;
-    }
-    
-    /* 4. تنسيق الـ Tabs */
-    .stTabs [data-baseweb="tab"] {
-        color: #94a3b8 !important;
-        font-size: 16px !important;
-    }
-    .stTabs [aria-selected="true"] {
-        color: #FFFFFF !important;
-    }
-    
-    /* 5. تحسين خلفية مدخلات النص */
-    .stTextInput input, .stTextArea textarea {
-        background-color: #1e293b !important;
-        border: 1px solid #334155 !important;
+        border-radius: 10px !important;
     }
     </style>
 """, unsafe_allow_html=True)
