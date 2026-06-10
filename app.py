@@ -335,8 +335,8 @@ st.markdown("""
     }
 
     /* 2. فرض اللون الأبيض على كافة النصوص والعناوين */
-    h1, h2, h3, h4, p, label, div, span {
-        color: #FFFFFF !important;
+    h1, h2, h3, h4, p, label, div, span, l1 {
+        color: #000000 !important;
     }
 
     /* 3. حل مشكلة الـ Selectbox (القائمة المنسدلة) - هذا هو الأهم */
