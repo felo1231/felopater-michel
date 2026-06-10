@@ -338,7 +338,7 @@ st.markdown("""
     div{
         color: #000000 !important;
     }
-    h1, h2, h3, h4, label, p, span, l1 {
+    h1, h2, h3, h4, label, p, span {
         color: #ffffff !important;
     }
 
@@ -369,7 +369,7 @@ st.markdown("""
     /* 5. تنسيق الـ Text Inputs */
     .stTextInput input, .stTextArea textarea {
         background-color: #1e293b !important;
-        color: #000000 !important;
+        color: #ffffff !important;
         border: 1px solid #475569 !important;
     }
     </style>
