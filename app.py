@@ -11,13 +11,12 @@ import typing_extensions as typing
 # --- APP CONFIG & SETUP ---
 st.set_page_config(page_title="AI Study Assistant", layout="wide")
 st.title('AI Studying Assistant✨')
-# ضعه تحت سطر ai.configure(api_key=api_key) مباشرة
 
 # --- GEMINI SETUP ---
 try:
     api_key = st.secrets["GEMINI_API_KEY"]
     ai.configure(api_key=api_key)
-    # محاولة تشغيل الموديل المستقر الحديث، وإذا لم يدعمه السيرفر يتراجع للإصدار الاحتياطي تلقائياً
+    
     try:
         model = ai.GenerativeModel(model_name='gemini-3.5-flash')
     except Exception:
@@ -45,6 +44,8 @@ if "generated_otp" not in st.session_state:
     st.session_state.generated_otp = None
 if "otp_sent" not in st.session_state:
     st.session_state.otp_sent = False
+if "quiz_index" not in st.session_state:
+    st.session_state.quiz_index = 0
 
 def send_otp_to_user(user_email, otp_code):
     try:
@@ -130,22 +131,14 @@ with questions_tab:
     question = st.chat_input('Enter your question:')
 
     if question:
-        # عرض سؤال المستخدم
         with st.chat_message('human', avatar='😉'):
             st.write(question)
             
-        # عرض رد الذكاء الاصطناعي مع نظام حماية ذكي لمنع الانهيار
         with st.chat_message('ai', avatar='🤖'):
             prompt = f"Expert {subject} assistant. Level: {edu_level}. Tone: {tone}. Detail: {details}. Question: {question}"
             with st.spinner('Thinking...'):
-                try:
                     answer = model.generate_content(prompt)
                     st.write(answer.text)
-                except Exception as e:
-                    if "quota" in str(e).lower() or "429" in str(e) or "exhausted" in str(e).lower():
-                        st.warning("⚠️ لقد تجاوزت حد الطلبات المسموح به حالياً (Quota Exhausted). يرجى الانتظار دقيقة واحدة ثم أعد إرسال سؤالك.")
-                    else:
-                        st.error("عذراً، الخادم مشغول حالياً. يرجى المحاولة مرة أخرى بعد قليل.")
 
 # --- 5. QUIZZES CONFIG & TAB ---
 class QuizQuestion(typing.TypedDict):
@@ -162,7 +155,7 @@ with quizzes_tab:
         grade_level = st.selectbox(
             "Select your Grade/Level:",
             options=["Grade 1","Grade 2","Grade 3","Grade 4","Grade 5","Grade 6","Grade 7", "Grade 8", "Grade 9", "High School", "University"],
-            index=7  # مضبوط افتراضياً على الصف الثامن
+            index=7
         )
 
     with col_q2:
@@ -187,10 +180,11 @@ with quizzes_tab:
                     st.session_state.quiz_data = json.loads(response.text)
                     st.session_state.user_answers = {}
                     st.session_state.quiz_submitted = False
+                    st.session_state.quiz_index += 1  # زيادة العداد لتصفير أزرار الراديو القديمة
                     st.success("تم صياغة الاختبار بنجاح! حل الأسئلة بالأسفل 👇")
                     
                 except Exception as e:
-                    if "quota" in str(e).lower() or "429" in str(e) or "exhausted" in str(e).lower():
+                    if "quota" in str(e).lower() or "429" in str(e):
                         st.warning("⚠️ لقد قمت بإرسال طلبات كثيرة في وقت قصير. يرجى الانتظار لمدة دقيقة ثم المحاولة مرة أخرى.")
                     else:
                         st.error("الخادم مشغول حالياً، يرجى إعادة الضغط على زر التوليد مرة أخرى.")
@@ -203,10 +197,11 @@ with quizzes_tab:
             for i, q_item in enumerate(st.session_state.quiz_data):
                 st.subheader(f"Question {i+1}")
                 st.write(q_item["question"])
+                # ربط الـ key بالـ quiz_index يمنع بقاء الإجابات السابقة معلمة
                 st.session_state.user_answers[i] = st.radio(
                     "Select an option:",
                     options=q_item["options"],
-                    key=f"quiz_q_{i}"
+                    key=f"quiz_q_{i}_{st.session_state.quiz_index}"
                 )
 
             submit_quiz = st.form_submit_button("Submit Answers ✅")
@@ -235,20 +230,14 @@ with quizzes_tab:
 
             if percentage == 100:
                 st.success("### 🏆 Mastermind Status!")
-                st.write("Perfect score! You've completely mastered this topic.")
             elif percentage >= 80:
                 st.success("### 🚀 Outstanding Work!")
-                st.write("You're a natural at this. Just a tiny bit more focus and you'll be at 100%.")
             elif percentage >= 60:
                 st.warning("### 📈 Great Progress!")
-                st.write("You've got the core concepts down! Review the questions you missed.")
             elif percentage >= 40:
                 st.info("### 🧠 Brain Power Building!")
-                st.write("Every mistake is just a data point for learning.")
             else:
                 st.error("### 🛡️ Don't Give Up!")
-                st.write("Let's try a 'Basic' level quiz to build your confidence!")
-
 
 # --- 6. STUDY PLANNER TAB ---
 with planner_tab:
@@ -271,18 +260,11 @@ with planner_tab:
             Suggest specific resources or topics to cover.
             """
             with st.spinner('Mapping out your journey...'):
-                try:
-                    plan_res = model.generate_content(plan_prompt)
-                    st.info("Here is your personalized study roadmap:")
-                    st.markdown(plan_res.text)
-                except Exception as e:
-                    if "quota" in str(e).lower() or "429" in str(e) or "exhausted" in str(e).lower():
-                        st.warning("⚠️ انتهت كوتا الاستخدام المؤقتة. انتظر دقيقة ثم اضغط على الزر مجدداً لتوليد الخطة الدراسية.")
-                    else:
-                        st.error("حدث خطأ ما أثناء إعداد الخطة. حاول مرة أخرى.")
+                plan_res = model.generate_content(plan_prompt)
+            st.info("Here is your personalized study roadmap:")
+            st.markdown(plan_res.text)
         else:
             st.warning("Tell me what you want to learn!")
-
 
 # --- 7. ACCOUNT TAB ---
 with account_tab:
@@ -290,8 +272,7 @@ with account_tab:
     st.success(f"مرحباً بك! أنت مسجل الدخول حالياً بحساب: **{st.session_state.user_email}**")
     st.info(f"البريد الرسمي للمساعد الدراسي: {OFFICIAL_EMAIL}")
     
-    # 🌟 التعديل الأساسي هنا: إضافة key مخصص لمنع تكرار الـ ID في الـ Streamlit
-    if st.button("تسجيل الخروج 🚪", key="logout_button_unique"):
+    if st.button("تسجيل الخروج 🚪"):
         st.session_state.logged_in = False
         st.session_state.generated_otp = None
         st.session_state.otp_sent = False

@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html lang="en">
+   <head>
+      <meta charset="utf-8">
+      <link rel="stylesheet" href="greeting.css">
+      <title>this is my first app development</title>
+   </head>
+   <body>
+      <h1 class="main-title">Hello Mom!</h1>
+      
+      <div class="container">
+         <div>
+            <p>I am learning how to develop an app.</p>
+            <button onclick="showMenu(['Home', 'About', 'Contact', 'Services'])">
+               Show Menu
+            </button>
+         </div>
+         
+         <div id="menuContainer" style="margin-top: 20px;"></div>
+      </div>
+
+      <script>
+         function showMenu(menuItems) {
+            const container = document.getElementById('menuContainer');
+            // تفريغ الحاوية أولاً لمنع التكرار
+            container.innerHTML = ""; 
+            
+            // إنشاء قائمة غير مرتبة ul
+            const ul = document.createElement('ul');
+            ul.style.listStyleType = "none";
+            ul.style.padding = "0";
+            
+            // إضافة العناصر داخل القائمة
+            menuItems.forEach(item => {
+               const li = document.createElement('li');
+               li.textContent = item;
+               li.style.padding = "8px 12px";
+               li.style.margin = "5px 0";
+               li.style.background = "#e0e0e0";
+               li.style.borderRadius = "4px";
+               li.style.display = "inline-block";
+               li.style.marginRight = "10px";
+               ul.appendChild(li);
+            });
+            
+            container.appendChild(ul);
+         }
+      </script>
+   </body>
+</html>

@@ -1,0 +1,26 @@
+.main-title {
+    font-size: xx-large;
+    color: #0f65b6;
+    margin-bottom: 15px;
+}
+
+p {
+    font-size: medium;
+    color: #0f22ca;
+    margin-bottom: 20px;
+}
+
+button {
+    background-color: #0f65b6;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0f22ca;
+}
