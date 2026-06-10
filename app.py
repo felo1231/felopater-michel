@@ -340,11 +340,12 @@ with planner_tab:
 
 # --- 8. 3D MODELS TAB (تم تعديل الكود هنا) ---
 with model_tab:
+    api_image_key = st.secrets["image_api_key"]
     st.header("Generate a 3D Photo 🎨")
     re = requests.post(
         f"https://api.stability.ai/v2beta/stable-image/generate/sd3",
         headers={
-            "authorization": f"Bearer sk-MYAPIKEY",
+            "authorization": f"{api_image_key}",
             "accept": "image/*"
         },
         files={"none": ''},
