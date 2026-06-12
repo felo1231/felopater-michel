@@ -21,11 +21,19 @@ st.markdown("""
         color: #ffffff !important;
     }
     
+    /* استهداف أي زرار Streamlit في الصفحة بأكملها */
     div[data-testid="stButton"] button {
-        background-color: #a984d9 !importanف; /* لون الخلفية */
-        border-radius: 10px !important;       /* حواف دائرية */
-        border: none !important;             /* إلغاء الإطار الافتراضي */
-        transition: background-color 0.4s ease !important;
+        background-color: #a984d9 !important; /* لونك الأصلي */
+        color: white !important;
+        border-radius: 8px !important;
+        border: none !important;
+        transition: background-color 0.3s ease !important;
+    }
+    
+    /* تأثير الـ Hover على كل الأزرار */
+    div[data-testid="stButton"] button:hover {
+        background-color: #8e65c9 !important; /* اللون الأغمق عند الوقوف بالماوس */
+        color: white !important;
     }
             
             
