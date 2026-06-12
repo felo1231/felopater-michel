@@ -17,8 +17,11 @@ st.markdown("""
     }
 
     /* 2. فرض اللون الأبيض على كافة النصوص والعناوين */
-    p{
+    p {
         color: #ffffff !important;
+    }
+    div {
+        color: #000000 !important;
     }
     
     /* استهداف الأزرار العادية وأزرار الفورم معاً */
@@ -194,13 +197,15 @@ questions_tab, quizzes_tab, planner_tab, account_tab, model_tab = st.tabs(
 
 # --- 4. QUESTIONS TAB ---
 with questions_tab:
+    st.header("Write Your Questions Here ⁉️")
     col1, col2 = st.columns(2)
     with col1:
         subject = st.selectbox(label='Choose a subject:', options=['Math', 'Programming', 'Physics', 'AI','chemistry','دراسات اجتماعية','اللغةالعربية','science','biology','english'], key='q_sub')
         tone = st.selectbox(label='Choose a tone:', options=['Friendly', 'Professional'], key='q_tone')
     with col2:
         details = st.selectbox(label='Choose level of details:', options=['Brief', 'Medium', 'Detailed'], key='q_det')
-        edu_level = st.selectbox(label='Choose educational level:', options=['School', 'University', 'Graduated'], key='q_edu')
+        edu_level = st.selectbox(label='Choose educational level:', options=['grade 1', 'grade 2', 'grade 3',  'grade 4', 'grade 5', 'grade 6',
+                                                                              'grade 7', 'grade 8', 'grade 9', 'University', 'Graduated'], key='q_edu')
 
     st.divider()
     
