@@ -21,7 +21,21 @@ st.markdown("""
         color: #000000 !important;
     }
     h1, h2, h3, h4, label, p, span, l1 {
-        color: #000000 !important;
+        color: #ffffff !important;
+    }
+            
+    div.stButton > button:first-child {
+        background-color: #a984d9; /* لون الخلفية */
+        color: white;             /* لون النص */
+        border-radius: 8px;       /* حواف دائرية */
+        border: none;             /* إلغاء الإطار الافتراضي */
+        transition: background-color 0.5s ease;
+    }
+    
+    /* تغيير اللون لما الماوس يقف على الزرار (Hover) */
+    div.stButton > button:first-child:hover {
+        background-color: #c4a5ed;
+        color: white;
     }
 
 
