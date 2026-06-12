@@ -24,18 +24,18 @@ st.markdown("""
         color: #ffffff !important;
     }
             
-    div.stButton > button:first-child {
-        background-color: #a984d9; /* لون الخلفية */
-        color: white;             /* لون النص */
-        border-radius: 8px;       /* حواف دائرية */
-        border: none;             /* إلغاء الإطار الافتراضي */
-        transition: background-color 0.5s ease;
+    div[data-testid="stButton"] button {
+        background-color: #a984d9 !importanف; /* لون الخلفية */
+        color: white !important;             /* لون النص */
+        border-radius: 10px !important;       /* حواف دائرية */
+        border: none !important;             /* إلغاء الإطار الافتراضي */
+        transition: background-color 0.5s ease !important;
     }
     
     /* تغيير اللون لما الماوس يقف على الزرار (Hover) */
-    div.stButton > button:first-child:hover {
-        background-color: #c4a5ed;
-        color: 000000;
+    div[data-testid="stButton"] button:hover {
+        background-color: #c4a5ed !important;
+        color: #000000 !important;
     }
 
 
