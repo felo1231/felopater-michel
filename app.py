@@ -20,23 +20,19 @@ st.markdown("""
     div{
         color: #000000 !important;
     }
-    h1, h2, h3, h4, label, p, span, l1 {
-        color: #ffffff ;
-    }
-            
+    
     div[data-testid="stButton"] button {
         background-color: #a984d9 !importanف; /* لون الخلفية */
         border-radius: 10px !important;       /* حواف دائرية */
         border: none !important;             /* إلغاء الإطار الافتراضي */
         transition: background-color 0.5s ease !important;
     }
-    
-    /* تغيير اللون لما الماوس يقف على الزرار (Hover) */
-    div[data-testid="stButton"] button:hover {
-        background-color: #c4a5ed !important;
-        color: #000000 !important;
+            
+            
+    h1, h2, h3, h4, label, p, span, l1 {
+        color: #ffffff ;
     }
-
+            
 
     /* 3. حل مشكلة الـ Selectbox (القائمة المنسدلة) - هذا هو الأهم */
     /* تغيير لون خلفية المربع ونص المربع نفسه */
