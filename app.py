@@ -30,7 +30,7 @@ st.markdown("""
             
             
     h1, h2, h3, h4, label, p, span, l1 {
-        color: ##a984d9 ;
+        color: #a984d9 ;
     }
             
 
