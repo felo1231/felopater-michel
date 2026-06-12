@@ -26,7 +26,6 @@ st.markdown("""
             
     div[data-testid="stButton"] button {
         background-color: #a984d9 !importanف; /* لون الخلفية */
-        color: white !important;             /* لون النص */
         border-radius: 10px !important;       /* حواف دائرية */
         border: none !important;             /* إلغاء الإطار الافتراضي */
         transition: background-color 0.5s ease !important;
