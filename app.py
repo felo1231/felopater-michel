@@ -49,7 +49,7 @@ st.markdown("""
     div[data-baseweb="select"] > div {
         background-color: #a984d9 !important;
         border: 1px solid #a984d9 !important;
-        color: #ffffff !important;
+        color: #000000 !important;
     }
     
     /* تغيير لون النص داخل القائمة عند فتحها */
