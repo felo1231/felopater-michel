@@ -7,9 +7,7 @@ import random
 from streamlit_cookies_controller import CookieController
 from email_validator import validate_email, EmailNotValidError
 import typing_extensions as typing
-import requests
-import io
-from PIL import Image
+
 
 st.markdown("""
     <style>
@@ -171,7 +169,7 @@ if not st.session_state.logged_in:
 # --- APP TABS ---
 # الصحيح: قائمة واحدة تضم كل الـ Tabs
 questions_tab, quizzes_tab, planner_tab, account_tab, model_tab = st.tabs(
-    ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅', 'Account 👤', '3D Models 🎨']
+    ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅', 'Account 👤', 'Models 🎨']
 )
 
 # --- 4. QUESTIONS TAB ---
@@ -203,12 +201,9 @@ with questions_tab:
         with st.chat_message('ai', avatar='🤖'):
             prompt = f"Expert {subject} assistant. Level: {edu_level}. Tone: {tone}. Detail: {details}. Question: {question}"
             with st.spinner('Thinking...'):
-                try:
-                    answer = model.generate_content(prompt)
-                    st.write(answer.text)
-                    st.session_state.chat_history.append({"role": "ai", "avatar": "🤖", "text": answer.text})
-                except Exception as e:
-                    st.error("عذراً، حدث خطأ أثناء الاتصال بالخادم.")
+                answer = model.generate_content(prompt)
+                st.write(answer.text)
+                st.session_state.chat_history.append({"role": "ai", "avatar": "🤖", "text": answer.text})
         
         # إعادة تشغيل سريعة لتثبيت الشات في مكانه الصحيح فوق خانة الكتابة
         st.rerun()
