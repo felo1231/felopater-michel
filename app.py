@@ -25,7 +25,7 @@ st.markdown("""
     div[data-testid="stButton"] button, 
     div[data-testid="stFormSubmitButton"] button {
         background-color: #a984d9 !important; /* لونك البنفسجي */
-        color: white !important;
+        color: black !important;
         border-radius: 8px !important;
         border: none !important;
         transition: background-color 0.3s ease !important;
