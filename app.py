@@ -35,7 +35,7 @@ st.markdown("""
     /* تغيير اللون لما الماوس يقف على الزرار (Hover) */
     div.stButton > button:first-child:hover {
         background-color: #c4a5ed;
-        color: white;
+        color: 000000;
     }
 
 
