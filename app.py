@@ -18,7 +18,7 @@ st.markdown("""
 
     /* 2. فرض اللون الأبيض على كافة النصوص والعناوين */
     div{
-        color: #000000 !important;
+        color: #ffffff !important;
     }
     
     div[data-testid="stButton"] button {
