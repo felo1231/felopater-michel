@@ -25,11 +25,11 @@ st.markdown("""
         background-color: #a984d9 !importanف; /* لون الخلفية */
         border-radius: 10px !important;       /* حواف دائرية */
         border: none !important;             /* إلغاء الإطار الافتراضي */
-        transition: background-color 0.5s ease !important;
+        transition: background-color 0.4s ease !important;
     }
             
             
-    h1, h2, h3, h4, label, p, span {
+    h1, h2, h3, h4, label, p, span, l1 {
         color: #ffffff ;
     }
             
