@@ -20,12 +20,10 @@ st.markdown("""
     div{
         color: #000000 !important;
     }
-    h1, h2, h3, h4, label, span, l1 {
+    h1, h2, h3, h4, label, p, span, l1 {
         color: #ffffff !important;
     }
-    p{
-        colo: #a984d9 !important;
-    }
+
 
     /* 3. حل مشكلة الـ Selectbox (القائمة المنسدلة) - هذا هو الأهم */
     /* تغيير لون خلفية المربع ونص المربع نفسه */
