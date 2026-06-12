@@ -201,9 +201,12 @@ with questions_tab:
         with st.chat_message('ai', avatar='🤖'):
             prompt = f"Expert {subject} assistant. Level: {edu_level}. Tone: {tone}. Detail: {details}. Question: {question}"
             with st.spinner('Thinking...'):
-                answer = model.generate_content(prompt)
-                st.write(answer.text)
-                st.session_state.chat_history.append({"role": "ai", "avatar": "🤖", "text": answer.text})
+                try:
+                    answer = model.generate_content(prompt)
+                    st.write(answer.text)
+                    st.session_state.chat_history.append({"role": "ai", "avatar": "🤖", "text": answer.text})
+                except Exception as e:
+                    st.error("عذراً، حدث خطأ أثناء الاتصال بالخادم.")
         
         # إعادة تشغيل سريعة لتثبيت الشات في مكانه الصحيح فوق خانة الكتابة
         st.rerun()
@@ -333,3 +336,22 @@ with planner_tab:
         else:
             st.warning("Tell me what you want to learn!")
 
+# --- 7. ACCOUNT TAB ---
+with account_tab:
+    st.header("👤 Account Settings")
+    st.success(f"مرحباً بك! أنت مسجل الدخول حالياً بحساب: **{st.session_state.user_email}**")
+    st.info(f"البريد الرسمي للمساعد الدراسي: {OFFICIAL_EMAIL}")
+    
+    if st.button("تسجيل الخروج 🚪"):
+        st.session_state.logged_in = False
+        st.session_state.generated_otp = None
+        st.session_state.otp_sent = False
+        st.session_state.user_email = None
+        
+        try:
+            if controller.get("remembered_user"):
+                controller.remove("remembered_user")
+        except Exception:
+            pass
+            
+        st.rerun()
