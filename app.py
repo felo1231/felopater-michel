@@ -21,17 +21,19 @@ st.markdown("""
         color: #ffffff !important;
     }
     
-    /* استهداف أي زرار Streamlit في الصفحة بأكملها */
-    div[data-testid="stButton"] button {
-        background-color: #a984d9 !important; /* لونك الأصلي */
+    /* استهداف الأزرار العادية وأزرار الفورم معاً */
+    div[data-testid="stButton"] button, 
+    div[data-testid="stFormSubmitButton"] button {
+        background-color: #a984d9 !important; /* لونك البنفسجي */
         color: white !important;
         border-radius: 8px !important;
         border: none !important;
         transition: background-color 0.3s ease !important;
     }
     
-    /* تأثير الـ Hover على كل الأزرار */
-    div[data-testid="stButton"] button:hover {
+    /* تأثير الـ Hover للنوعين */
+    div[data-testid="stButton"] button:hover, 
+    div[data-testid="stFormSubmitButton"] button:hover {
         background-color: #8e65c9 !important; /* اللون الأغمق عند الوقوف بالماوس */
         color: white !important;
     }
@@ -335,7 +337,7 @@ with planner_tab:
         goal = st.text_area("What is your learning goal?", placeholder="e.g. Master React.js in two weeks")
         time_commit = st.number_input("How many hours can you study per day?", min_value=1, max_value=16, value=2)
         experience = st.selectbox("Current experience level:", ["Complete Beginner", "Intermediate", "Advanced"])
-        st.button("Create My Plan 🚀")
+
         submit_plan = st.form_submit_button("Create My Plan 🚀")
 
     if submit_plan:
