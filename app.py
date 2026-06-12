@@ -335,7 +335,7 @@ with planner_tab:
         goal = st.text_area("What is your learning goal?", placeholder="e.g. Master React.js in two weeks")
         time_commit = st.number_input("How many hours can you study per day?", min_value=1, max_value=16, value=2)
         experience = st.selectbox("Current experience level:", ["Complete Beginner", "Intermediate", "Advanced"])
-
+        st.button("Create My Plan 🚀")
         submit_plan = st.form_submit_button("Create My Plan 🚀")
 
     if submit_plan:
