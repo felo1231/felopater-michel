@@ -35,7 +35,7 @@ st.markdown("""
     div[data-testid="stButton"] button:hover, 
     div[data-testid="stFormSubmitButton"] button:hover {
         background-color: #8e65c9 !important; /* اللون الأغمق عند الوقوف بالماوس */
-        color: white !important;
+        color: black !important;
     }
             
             
