@@ -355,3 +355,7 @@ with account_tab:
             pass
             
         st.rerun()
+
+with model_tab:
+    st.header("🎨 Generate Your Photo On 3D Model")
+    st.write("اكتب وصفاً لأي شيء تريد تخيله كمجسم ثلاثي الأبعاد أو مشهد مجسم، وسيقوم التطبيق بتوليد الفكرة وعرضها لك!")
