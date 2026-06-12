@@ -196,7 +196,7 @@ questions_tab, quizzes_tab, planner_tab, account_tab, model_tab = st.tabs(
 with questions_tab:
     col1, col2 = st.columns(2)
     with col1:
-        subject = st.selectbox(label='Choose a subject:', options=['Math', 'Programming', 'Physics', 'AI','chemistry','دراسات اجتماعية','اللغةالعربية','science','biology'], key='q_sub')
+        subject = st.selectbox(label='Choose a subject:', options=['Math', 'Programming', 'Physics', 'AI','chemistry','دراسات اجتماعية','اللغةالعربية','science','biology','english'], key='q_sub')
         tone = st.selectbox(label='Choose a tone:', options=['Friendly', 'Professional'], key='q_tone')
     with col2:
         details = st.selectbox(label='Choose level of details:', options=['Brief', 'Medium', 'Detailed'], key='q_det')
