@@ -11,71 +11,54 @@ import typing_extensions as typing
 
 st.markdown("""
     <style>
-    /* 1. الخلفية العامة */
     .stApp {
-        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%) !important;
+        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+        background-size: 400% 400%;
+        animation: gradient 15s ease infinite;
     }
 
-    /* 2. فرض اللون الأبيض على كافة النصوص والعناوين */
-    p {
-        color: #ffffff !important;
-    }
-    div {
-        color: #000000 !important;
-    }
-    
-    /* استهداف الأزرار العادية وأزرار الفورم معاً */
-    div[data-testid="stButton"] button, 
-    div[data-testid="stFormSubmitButton"] button {
-        background-color: #a984d9 !important; /* لونك البنفسجي */
-        color: black !important;
-        border-radius: 8px !important;
-        border: none !important;
-        transition: background-color 0.3s ease !important;
-    }
-    
-    /* تأثير الـ Hover للنوعين */
-    div[data-testid="stButton"] button:hover, 
-    div[data-testid="stFormSubmitButton"] button:hover {
-        background-color: #8e65c9 !important; /* اللون الأغمق عند الوقوف بالماوس */
-        color: black !important;
-    }
-            
-            
-    h1, h2, h3, h4, label, div, span, l1 {
-        color: #ffffff ;
-    }
-            
-
-    /* 3. حل مشكلة الـ Selectbox (القائمة المنسدلة) - هذا هو الأهم */
-    /* تغيير لون خلفية المربع ونص المربع نفسه */
-    div[data-baseweb="select"] > div {
-        background-color: #a984d9 !important;
-        border: 1px solid #a984d9 !important;
-        color: #000000 !important;
-    }
-    
-    /* تغيير لون النص داخل القائمة عند فتحها */
-    div[role="listbox"] div {
-        background-color: #1e293b !important;
-        color: #000000 !important;
-    }
-    
-    /* تغيير لون السهم في القائمة المنسدلة */
-    div[data-baseweb="select"] svg {
-        fill: #a984d9 !important;
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
     }
 
-    /* 4. تنسيق خيارات الـ Radio (الكويز) */
-    div[role="radiogroup"] label {
-        color: #a984d9 !important;
+    .main .block-container {
+        background: rgba(255, 255, 255, 0.92);
+        padding: 2.5rem;
+        border-radius: 20px;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(8px);
+        margin-top: 2rem;
+        margin-bottom: 2rem;
     }
 
-    /* 5. تنسيق الـ Text Inputs */
-    .stTextInput input, .stTextArea textarea {
-        background-color: #a984d9 !important;
-        color: #000000 !important;
-        border: 1px solid #475569 !important;
+    .main-title {
+        color: #0f172a;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-weight: 800;
+        font-size: 2.3rem;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    div.stButton > button {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: #ffffff;
+        border-radius: 10px;
+        padding: 12px 28px;
+        font-weight: 700;
+        font-size: 1rem;
+        border: none;
+        width: 100%;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+    }
+
+    div.stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.35);
+        color: #38bdf8;
     }
     </style>
 """, unsafe_allow_html=True)
