@@ -8,7 +8,8 @@ from streamlit_cookies_controller import CookieController
 from email_validator import validate_email, EmailNotValidError
 import typing_extensions as typing
 import urllib.parse
-import requests
+from gtts import gTTS
+import io
 
 
 st.markdown("""
@@ -176,8 +177,8 @@ if not st.session_state.logged_in:
 
 # --- APP TABS ---
 # الصحيح: قائمة واحدة تضم كل الـ Tabs
-questions_tab, quizzes_tab, planner_tab, model_tab, account_tab, note_tab = st.tabs(
-    ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅', 'Models 🎨', 'Account 👤', 'Important Notes 📌']
+questions_tab, quizzes_tab, planner_tab, flashcards_tab, cheatsheet_tab, pomodoro_tab, model_tab, account_tab, note_tab = st.tabs(
+    ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅', 'Flashcards🗂️','Cheat-Sheet 📄', 'Pomodoro ⏱️', 'Models 🎨', 'Account 👤', 'Important Notes 📌']
 )
 
 # --- 4. QUESTIONS TAB ---
@@ -360,6 +361,90 @@ with planner_tab:
             st.markdown(plan_res.text)
         else:
             st.warning("Tell me what you want to learn!")
+
+# --- 4. AI FLASHCARDS TAB 🗂️ ---
+class FlashcardItem(typing.TypedDict):
+    front: str
+    back: str
+
+with flashcards_tab:
+    st.header("AI Flashcards 🗂️")
+    st.write("اكتب اسم الدرس أو المفهوم، وسيقوم الذكاء الاصطناعي بتوليد فلاش كاردز تفاعلية للمراجعة السريعة!")
+    
+    fc_topic = st.text_input("أدخل موضوع الدرس أو المفاهيم:", placeholder="مثلاً: قوانين نيوتن أو أساسيات بايثون")
+    fc_count = st.slider("عدد الكروت:", 3, 10, 5)
+
+    if st.button("توليد الفلاش كاردز 🎴", key="gen_fc_btn"):
+        if fc_topic:
+            with st.spinner("جاري صياغة الفلاش كاردز..."):
+                fc_prompt = f"""
+                Generate {fc_count} study flashcards for the topic: {fc_topic}.
+                Return JSON list of objects with keys "front" (question/concept) and "back" (concise answer/definition).
+                """
+                try:
+                    res = model.generate_content(
+                        fc_prompt,
+                        generation_config={
+                            "response_mime_type": "application/json",
+                            "response_schema": list[FlashcardItem],
+                        }
+                    )
+                    st.session_state.flashcards = json.loads(res.text)
+                    st.success("تم توليد البطاقات بنجاح!")
+                except Exception as e:
+                    st.error(f"خطأ: {e}")
+
+    if "flashcards" in st.session_state and st.session_state.flashcards:
+        st.divider()
+        for idx, card in enumerate(st.session_state.flashcards):
+            with st.expander(f"بطاقة رقم {idx+1}: {card['front']}"):
+                st.markdown(f"الإجابة / المفهوم:")
+                c1, c2 = st.columns(2)
+                with c1:
+                    if st.button("فهمته جيداً ✅", key=f"know_{idx}"):
+                        st.toast("ممتاز! استمر في التقدم 🌟")
+                with c2:
+                    if st.button("أحتاج مراجعة 🔁", key=f"rev_{idx}"):
+                        st.toast("سجلنا أنك تحتاج مراجعتها لاحقاً 💪")
+
+# --- 5. SMART CHEAT-SHEET GENERATOR 📄 ---
+with cheatsheet_tab:
+    st.header("Smart Cheat-Sheet Generator 📄")
+    st.write("الصلِق نص الدرس هنا، وسيقوم الـ AI باستخراج جدول لأهم المصطلحات، القوانين، وأهم الأسئلة المتوقعة في الامتحان!")
+    
+    lesson_text = st.text_area("ألصق محتوى أو نص الدرس هنا:", height=180, placeholder="ضع ملخص الدرس أو المقال هنا...")
+
+    if st.button("إنشاء ملخص الغش وورقة المراجعة ⚡", key="gen_cheat_btn"):
+        if lesson_text:
+            with st.spinner("جاري تحليل النص واستخراج الخلاصة..."):
+                cheat_prompt = f"""
+                Analyze the following lesson text and produce:
+                1. A table of key terms and definitions.
+                2. Key rules/formulas or core points.
+                3. Top 3 expected exam questions with brief answers.
+                Lesson text: {lesson_text}
+                """
+                cheat_res = model.generate_content(cheat_prompt)
+                st.markdown(cheat_res.text)
+        else:
+            st.warning("الرجاء لصق نص الدرس أولاً!")
+
+# --- 6. SMART POMODORO WITH CHALLENGES ⏱️ ---
+with pomodoro_tab:
+    st.header("Smart Pomodoro Timer ⏱️")
+    st.write("مؤقت تركيز بومودورو (25 دقيقة عمل / 5 دقائق راحة) مع تحديات ولغز علمي لتنشيط ذهنك في وقت الاستراحة!")
+
+    col_p1, col_p2 = st.columns(2)
+    with col_p1:
+        work_mins = st.number_input("مدة وقت التركيز (دقائق):", min_value=1, max_value=60, value=25)
+    with col_p2:
+        break_mins = st.number_input("مدة الاستراحة (دقائق):", min_value=1, max_value=30, value=5)
+
+    if st.button("توليد لغز أو تحدي استراحة علمي 🧩", key="pomo_puzzle_btn"):
+        with st.spinner("جاري ابتكار تحدي استراحة..."):
+            puzzle_res = model.generate_content("Give a fun, short science or logic puzzle with its hidden answer for a study break.")
+            st.info("### 🧩 تحدي الاستراحة:")
+            st.markdown(puzzle_res.text)
 
 with model_tab:
     st.header("🎨 Generate Your Photo On 3D Model")

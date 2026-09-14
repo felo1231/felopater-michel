@@ -2,3 +2,4 @@ streamlit
 google-generativeai
 streamlit-cookies-controller
 email-validator
+gtts
