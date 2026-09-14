@@ -361,26 +361,6 @@ with planner_tab:
         else:
             st.warning("Tell me what you want to learn!")
 
-# --- 7. ACCOUNT TAB ---
-with account_tab:
-    st.header("👤 Account Settings")
-    st.success(f"مرحباً بك! أنت مسجل الدخول حالياً بحساب: **{st.session_state.user_email}**")
-    st.info(f"البريد الرسمي للمساعد الدراسي: {OFFICIAL_EMAIL}")
-    
-    if st.button("تسجيل الخروج 🚪"):
-        st.session_state.logged_in = False
-        st.session_state.generated_otp = None
-        st.session_state.otp_sent = False
-        st.session_state.user_email = None
-        
-        try:
-            if controller.get("remembered_user"):
-                controller.remove("remembered_user")
-        except Exception:
-            pass
-            
-        st.rerun()
-
 with model_tab:
     st.header("🎨 Generate Your Photo On 3D Model")
     st.write("اكتب وصفاً لأي شيء تريد تخيله كمجسم ثلاثي الأبعاد أو مشهد مجسم، وسيقوم التطبيق بتوليد الفكرة وعرضها لك!")
@@ -401,3 +381,23 @@ with model_tab:
                     st.error(f" حدث خطأ أثناء تحميل الصورة: {e}")
         else:
             st.warning("الرجاء كتابة وصف أولاً!")
+
+# --- 7. ACCOUNT TAB ---
+with account_tab:
+    st.header("👤 Account Settings")
+    st.success(f"مرحباً بك! أنت مسجل الدخول حالياً بحساب: **{st.session_state.user_email}**")
+    st.info(f"البريد الرسمي للمساعد الدراسي: {OFFICIAL_EMAIL}")
+    
+    if st.button("تسجيل الخروج 🚪"):
+        st.session_state.logged_in = False
+        st.session_state.generated_otp = None
+        st.session_state.otp_sent = False
+        st.session_state.user_email = None
+        
+        try:
+            if controller.get("remembered_user"):
+                controller.remove("remembered_user")
+        except Exception:
+            pass
+            
+        st.rerun()
