@@ -15,7 +15,7 @@ import io
 st.markdown("""
     <style>
     .stApp {
-        background: linear-gradient(-45deg, #19f775, #19f7b1, #19f7da, #19ecf7, #19cbf7, #19b1f7, #1993f7, #196ef7);
+        background: linear-gradient(-45deg, #22abbd, #2293bd, #227cbd, #2265bd, #2243bd, #2231bd);
         background-size: 400% 400%;
         animation: gradient 15s ease infinite;
     }
