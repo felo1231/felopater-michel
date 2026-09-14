@@ -78,11 +78,11 @@ try:
     except:
         api_key = st.secrets["GEMINI_API_KEY2"]
         ai.configure(api_key=api_key)
-        
+
     try:
-        model = ai.GenerativeModel(model_name='gemini-3.5-flash')
+        model = ai.GenerativeModel(model_name='gemini-3.8-flash')
     except Exception:
-        model = ai.GenerativeModel(model_name='gemini-1.5-flash-latest')
+        model = ai.GenerativeModel(model_name='gemini-3.7-flash')
         
 except Exception as e:
     st.error("خطأ في إعدادات الاتصال: تأكد من إضافة GEMINI_API_KEY في إعدادات التطبيق.")
