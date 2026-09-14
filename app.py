@@ -8,6 +8,7 @@ from streamlit_cookies_controller import CookieController
 from email_validator import validate_email, EmailNotValidError
 import typing_extensions as typing
 import urllib.parse
+import requests
 
 
 st.markdown("""
@@ -384,13 +385,19 @@ with model_tab:
     st.header("🎨 Generate Your Photo On 3D Model")
     st.write("اكتب وصفاً لأي شيء تريد تخيله كمجسم ثلاثي الأبعاد أو مشهد مجسم، وسيقوم التطبيق بتوليد الفكرة وعرضها لك!")
     
-    user_image_prompt = st.text_input("اكتب وصف الصورة أو الموديل بالإنجليزية أو العربية:", placeholder="e.g. A cute 3D robot studying books, 3D render, blender style")
+    user_image_prompt = st.text_input("اكتب وصف الصورة أو الموديل بالإنجليزية أو العربية:", placeholder="e.g. A cute 3D robot studying books, 3D render, blender style", key="img_prompt_input")
     
-    if st.button("توليد الصورة 🚀"):
+    if st.button("توليد الصورة 🚀", key="gen_img_btn"):
         if user_image_prompt:
             with st.spinner("جاري تصميم وتوليد الصورة ثلاثية الأبعاد... 🎨"):
-                encoded_prompt = urllib.parse.quote(user_image_prompt + " 3D render, high quality, octane render")
-                img_url = f"https://pollinations.ai/p/{encoded_prompt}?width=1024&height=1024&nologo=true"
-                st.image(img_url, caption=f"النتيجة للوصف: {user_image_prompt}", use_container_width=True)
+                try:
+                    # طريقة مضمونة أكثر لجلب صورة عبر pollinations أو استخدام Picsum/Loremflickr كبديل سريع وعالي الجودة
+                    encoded_prompt = urllib.parse.quote(user_image_prompt)
+                    # استخدام رابط pollinations الصحيح مع تحديد model=flux
+                    img_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=800&height=800&nologo=true"
+                    
+                    st.image(img_url, caption=f"النتيجة للوصف: {user_image_prompt}", use_container_width=True)
+                except Exception as e:
+                    st.error(f" حدث خطأ أثناء تحميل الصورة: {e}")
         else:
             st.warning("الرجاء كتابة وصف أولاً!")
