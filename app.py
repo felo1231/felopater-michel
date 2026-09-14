@@ -176,7 +176,7 @@ if not st.session_state.logged_in:
 
 # --- APP TABS ---
 # الصحيح: قائمة واحدة تضم كل الـ Tabs
-questions_tab, quizzes_tab, planner_tab, account_tab, model_tab = st.tabs(
+questions_tab, quizzes_tab, planner_tab, model_tab, account_tab = st.tabs(
     ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅', 'Models 🎨', 'Account 👤']
 )
 
