@@ -410,7 +410,7 @@ with flashcards_tab:
 # --- 5. SMART CHEAT-SHEET GENERATOR 📄 ---
 with cheatsheet_tab:
     st.header("Smart Cheat-Sheet Generator 📄")
-    st.write("الصلِق نص الدرس هنا، وسيقوم الـ AI باستخراج جدول لأهم المصطلحات، القوانين، وأهم الأسئلة المتوقعة في الامتحان!")
+    st.write("ألصق نص الدرس هنا، وسيقوم الـ AI باستخراج جدول لأهم المصطلحات، القوانين، وأهم الأسئلة المتوقعة في الامتحان!")
     
     lesson_text = st.text_area("ألصق محتوى أو نص الدرس هنا:", height=180, placeholder="ضع ملخص الدرس أو المقال هنا...")
 
@@ -424,8 +424,14 @@ with cheatsheet_tab:
                 3. Top 3 expected exam questions with brief answers.
                 Lesson text: {lesson_text}
                 """
-                cheat_res = model.generate_content(cheat_prompt)
-                st.markdown(cheat_res.text)
+                try:
+                    cheat_res = model.generate_content(cheat_prompt)
+                    st.markdown(cheat_res.text)
+                except Exception as e:
+                    if "ResourceExhausted" in str(e) or "429" in str(e):
+                        st.warning("⚠️ لقد تجاوزت الحد المسموح من الطلبات في الدقيقة (Quota Exhausted). يرجى الانتظار لمدة دقيقة والمحاولة مرة أخرى.")
+                    else:
+                        st.error(f"حدث خطأ أثناء الاتصال بالخادم: {e}")
         else:
             st.warning("الرجاء لصق نص الدرس أولاً!")
 
