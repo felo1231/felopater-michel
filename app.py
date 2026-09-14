@@ -7,6 +7,7 @@ import random
 from streamlit_cookies_controller import CookieController
 from email_validator import validate_email, EmailNotValidError
 import typing_extensions as typing
+import urllib.parse
 
 
 st.markdown("""
@@ -192,10 +193,12 @@ with questions_tab:
 
     st.divider()
     
-    # 🌟 2. هنا نقوم بعرض كل رسائل الشات القديمة المخزنة قبل خانة الكتابة
+    # عرض سجل المحادثات
     for msg in st.session_state.chat_history:
         with st.chat_message(msg["role"], avatar=msg["avatar"]):
             st.write(msg["text"])
+            if "image_url" in msg and msg["image_url"]:
+                st.image(msg["image_url"], use_container_width=True)
 
     question = st.chat_input('Enter your question:')
 
@@ -205,18 +208,31 @@ with questions_tab:
         with st.chat_message('human', avatar='😉'):
             st.write(question)
             
-        # توليد وحفظ وعرض رد الذكاء الاصطناعي في السجل
         with st.chat_message('ai', avatar='🤖'):
             prompt = f"Expert {subject} assistant. Level: {edu_level}. Tone: {tone}. Detail: {details}. Question: {question}"
-            with st.spinner('Thinking...'):
+            with st.spinner('Thinking and generating visual aid...'):
                 try:
                     answer = model.generate_content(prompt)
-                    st.write(answer.text)
-                    st.session_state.chat_history.append({"role": "ai", "avatar": "🤖", "text": answer.text})
+                    ans_text = answer.text
+                    st.write(ans_text)
+                    
+                    # 🌟 توليد/جلب صورة ذات صلة بالسؤال أو الإجابة عبر Pollinations AI (مجاني وبدون API Key)
+                    # نأخذ كلمات مفتاحية من السؤال أو نصفيها
+                    import urllib.parse
+                    safe_query = urllib.parse.quote(f"{subject} {question[:50]}")
+                    generated_image_url = f"https://pollinations.ai/p/{safe_query}?width=800&height=500&seed={random.randint(1,10000)}"
+                    
+                    st.image(generated_image_url, caption="صورة توضيحية تولدت بناءً على سؤالك 🖼️", use_container_width=True)
+                    
+                    st.session_state.chat_history.append({
+                        "role": "ai", 
+                        "avatar": "🤖", 
+                        "text": ans_text,
+                        "image_url": generated_image_url
+                    })
                 except Exception as e:
-                    st.error("عذراً، حدث خطأ أثناء الاتصال بالخادم.")
+                    st.error(f"عذراً، حدث خطأ: {e}")
         
-        # إعادة تشغيل سريعة لتثبيت الشات في مكانه الصحيح فوق خانة الكتابة
         st.rerun()
 
 # --- 5. QUIZZES CONFIG & TAB ---
@@ -367,3 +383,14 @@ with account_tab:
 with model_tab:
     st.header("🎨 Generate Your Photo On 3D Model")
     st.write("اكتب وصفاً لأي شيء تريد تخيله كمجسم ثلاثي الأبعاد أو مشهد مجسم، وسيقوم التطبيق بتوليد الفكرة وعرضها لك!")
+    
+    user_image_prompt = st.text_input("اكتب وصف الصورة أو الموديل بالإنجليزية أو العربية:", placeholder="e.g. A cute 3D robot studying books, 3D render, blender style")
+    
+    if st.button("توليد الصورة 🚀"):
+        if user_image_prompt:
+            with st.spinner("جاري تصميم وتوليد الصورة ثلاثية الأبعاد... 🎨"):
+                encoded_prompt = urllib.parse.quote(user_image_prompt + " 3D render, high quality, octane render")
+                img_url = f"https://pollinations.ai/p/{encoded_prompt}?width=1024&height=1024&nologo=true"
+                st.image(img_url, caption=f"النتيجة للوصف: {user_image_prompt}", use_container_width=True)
+        else:
+            st.warning("الرجاء كتابة وصف أولاً!")
