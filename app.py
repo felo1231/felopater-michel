@@ -406,4 +406,5 @@ with note_tab:
     st.header("📝 Treasure Notes")
     st.write("نقاط و معلومات يجب أن تعلمها!!")
     st.write("                                                                ")
-    st.text_area()
+    st.write("This is A Good Website to see All Informations and Books (Egyptian Knowledge Bank)")
+    st.text_area("https://www.ekb.eg/ar/home")
