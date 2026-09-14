@@ -176,8 +176,8 @@ if not st.session_state.logged_in:
 
 # --- APP TABS ---
 # الصحيح: قائمة واحدة تضم كل الـ Tabs
-questions_tab, quizzes_tab, planner_tab, model_tab, account_tab = st.tabs(
-    ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅', 'Models 🎨', 'Account 👤']
+questions_tab, quizzes_tab, planner_tab, model_tab, account_tab, note_tab = st.tabs(
+    ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅', 'Models 🎨', 'Account 👤', 'Important Notes 📌']
 )
 
 # --- 4. QUESTIONS TAB ---
@@ -401,3 +401,9 @@ with account_tab:
             pass
             
         st.rerun()
+
+with note_tab:
+    st.header("📝 Treasure Notes")
+    st.write("نقاط و معلومات يجب أن تعلمها!!")
+    st.write("                                                                ")
+    st.text_area()
