@@ -407,4 +407,4 @@ with note_tab:
     st.write("نقاط و معلومات يجب أن تعلمها!!")
     st.write("                                                                ")
     st.write("This is A Good Website to see All Informations and Books (Egyptian Knowledge Bank)")
-    st.text("https://www.ekb.eg/ar/home")
+    st.container("https://www.ekb.eg/ar/home")
