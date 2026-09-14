@@ -72,9 +72,13 @@ st.title('AI Studying Assistant✨')
 
 # --- GEMINI SETUP ---
 try:
-    api_key = st.secrets["GEMINI_API_KEY"]
-    ai.configure(api_key=api_key)
-    
+    try:
+        api_key = st.secrets["GEMINI_API_KEY"]
+        ai.configure(api_key=api_key)
+    except:
+        api_key = st.secrets["GEMINI_API_KEY2"]
+        ai.configure(api_key=api_key)
+        
     try:
         model = ai.GenerativeModel(model_name='gemini-3.5-flash')
     except Exception:
