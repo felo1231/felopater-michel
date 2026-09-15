@@ -82,7 +82,7 @@ try:
     try:
         model = ai.GenerativeModel(model_name='gemini-3.8-flash')
     except Exception:
-        model = ai.GenerativeModel(model_name='gemini-3.7-flash')
+        model = ai.GenerativeModel(model_name='gemini-3.6-flash')
         
 except Exception as e:
     st.error("خطأ في إعدادات الاتصال: تأكد من إضافة GEMINI_API_KEY في إعدادات التطبيق.")
