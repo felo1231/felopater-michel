@@ -4,3 +4,4 @@ streamlit-cookies-controller
 email-validator
 gtts
 pyserial
+plotly
