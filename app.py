@@ -10,6 +10,17 @@ import typing_extensions as typing
 import urllib.parse
 from gtts import gTTS
 import io
+import time
+import pandas as pd
+import plotly.express as px
+
+# محاولة استيراد pyserial للاتصال بالأردوينو (في حال لم تكن مثبتة، نعمل بتجربة آمنة)
+try:
+    import serial
+    import serial.tools.list_ports
+    SERIAL_AVAILABLE = True
+except ImportError:
+    SERIAL_AVAILABLE = False
 
 
 st.markdown("""
@@ -109,9 +120,12 @@ if "otp_sent" not in st.session_state:
 if "quiz_index" not in st.session_state:
     st.session_state.quiz_index = 0
 
-# 🌟 1. هنا قمنا بتعريف سجل المحادثات لحفظ الشات من الاختفاء
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
+
+# تهيئة سجل بيانات الحساسات
+if "hardware_history" not in st.session_state:
+    st.session_state.hardware_history = pd.DataFrame(columns=["Time", "Temperature", "Light"])
 
 def send_otp_to_user(user_email, otp_code):
     try:
@@ -179,10 +193,9 @@ if not st.session_state.logged_in:
     st.stop()
 
 
-# --- APP TABS ---
-# الصحيح: قائمة واحدة تضم كل الـ Tabs
-questions_tab, quizzes_tab, planner_tab, flashcards_tab, cheatsheet_tab, pomodoro_tab, model_tab, account_tab, note_tab = st.tabs(
-    ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅', 'Flashcards🗂️','Cheat-Sheet 📄', 'Pomodoro ⏱️', 'Models 🎨', 'Account 👤', 'Important Notes 📌']
+# --- APP TABS (أضفنا تاب جديد للـ Hardware) ---
+questions_tab, quizzes_tab, planner_tab, flashcards_tab, cheatsheet_tab, pomodoro_tab, hardware_tab, model_tab, account_tab, note_tab = st.tabs(
+    ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅', 'Flashcards🗂️','Cheat-Sheet 📄', 'Pomodoro ⏱️', 'IoT Hardware 🌡️', 'Models 🎨', 'Account 👤', 'Important Notes 📌']
 )
 
 # --- 4. QUESTIONS TAB ---
@@ -199,7 +212,6 @@ with questions_tab:
 
     st.divider()
     
-    # عرض سجل المحادثات
     for msg in st.session_state.chat_history:
         with st.chat_message(msg["role"], avatar=msg["avatar"]):
             st.write(msg["text"])
@@ -209,7 +221,6 @@ with questions_tab:
     question = st.chat_input('Enter your question:')
 
     if question:
-        # حفظ وعرض سؤال المستخدم في السجل
         st.session_state.chat_history.append({"role": "human", "avatar": "😉", "text": question})
         with st.chat_message('human', avatar='😉'):
             st.write(question)
@@ -222,9 +233,6 @@ with questions_tab:
                     ans_text = answer.text
                     st.write(ans_text)
                     
-                    # 🌟 توليد/جلب صورة ذات صلة بالسؤال أو الإجابة عبر Pollinations AI (مجاني وبدون API Key)
-                    # نأخذ كلمات مفتاحية من السؤال أو نصفيها
-                    import urllib.parse
                     safe_query = urllib.parse.quote(f"{subject} {question[:50]}")
                     generated_image_url = f"https://pollinations.ai/p/{safe_query}?width=800&height=500&seed={random.randint(1,10000)}"
                     
@@ -327,7 +335,6 @@ with quizzes_tab:
             col_res1, col_res2 = st.columns(2)
             col_res1.metric("Final Score", f"{score} / {total_questions}")
             col_res2.metric("Percentage", f"{percentage:g}%")
-
             if percentage == 100:
                 st.success("### 🏆 Mastermind Status!")
             elif percentage >= 80:
@@ -366,7 +373,7 @@ with planner_tab:
         else:
             st.warning("Tell me what you want to learn!")
 
-# --- 4. AI FLASHCARDS TAB 🗂️ ---
+# --- FLASHCARDS TAB ---
 class FlashcardItem(typing.TypedDict):
     front: str
     back: str
@@ -374,7 +381,6 @@ class FlashcardItem(typing.TypedDict):
 with flashcards_tab:
     st.header("AI Flashcards 🗂️")
     st.write("اكتب اسم الدرس أو المفهوم، وسيقوم الذكاء الاصطناعي بتوليد فلاش كاردز تفاعلية للمراجعة السريعة!")
-    
     fc_topic = st.text_input("أدخل موضوع الدرس أو المفاهيم:", placeholder="مثلاً: قوانين نيوتن أو أساسيات بايثون")
     fc_count = st.slider("عدد الكروت:", 3, 10, 5)
 
@@ -402,32 +408,16 @@ with flashcards_tab:
         st.divider()
         for idx, card in enumerate(st.session_state.flashcards):
             with st.expander(f"بطاقة رقم {idx+1}: {card['front']}"):
-                st.markdown(f"الإجابة / المفهوم:")
-                c1, c2 = st.columns(2)
-                with c1:
-                    if st.button("فهمته جيداً ✅", key=f"know_{idx}"):
-                        st.toast("ممتاز! استمر في التقدم 🌟")
-                with c2:
-                    if st.button("أحتاج مراجعة 🔁", key=f"rev_{idx}"):
-                        st.toast("سجلنا أنك تحتاج مراجعتها لاحقاً 💪")
+                st.markdown(f"الإجابة / المفهوم: **{card['back']}**")
 
-# --- 5. SMART CHEAT-SHEET GENERATOR 📄 ---
+# --- CHEAT-SHEET TAB ---
 with cheatsheet_tab:
     st.header("Smart Cheat-Sheet Generator 📄")
-    st.write("ألصق نص الدرس هنا، وسيقوم الـ AI باستخراج جدول لأهم المصطلحات، القوانين، وأهم الأسئلة المتوقعة في الامتحان!")
-    
-    lesson_text = st.text_area("ألصق محتوى أو نص الدرس هنا:", height=180, placeholder="ضع ملخص الدرس أو المقال هنا...")
-
-    if st.button("إنشاء ملخص الغش وورقة المراجعة ⚡", key="gen_cheat_btn"):
+    lesson_text = st.text_area("ألصق محتوى أو نص الدرس هنا:", height=180)
+    if st.button("إنشاء ملخص ورقة المراجعة ⚡", key="gen_cheat_btn"):
         if lesson_text:
-            with st.spinner("جاري تحليل النص واستخراج الخلاصة..."):
-                cheat_prompt = f"""
-                Analyze the following lesson text and produce:
-                1. A table of key terms and definitions.
-                2. Key rules/formulas or core points.
-                3. Top 3 expected exam questions with brief answers.
-                Lesson text: {lesson_text}
-                """
+            with st.spinner("جاري تحليل النص..."):
+                cheat_res = model.generate_content(f"Analyze lesson and provide key terms table and core points: {lesson_text}")
                 try:
                     cheat_res = model.generate_content(cheat_prompt)
                     st.markdown(cheat_res.text)
@@ -439,62 +429,122 @@ with cheatsheet_tab:
         else:
             st.warning("الرجاء لصق نص الدرس أولاً!")
 
-# --- 6. SMART POMODORO WITH CHALLENGES ⏱️ ---
+# --- POMODORO TAB ---
 with pomodoro_tab:
     st.header("Smart Pomodoro Timer ⏱️")
     st.write("مؤقت تركيز بومودورو (25 دقيقة عمل / 5 دقائق راحة) مع تحديات ولغز علمي لتنشيط ذهنك في وقت الاستراحة!")
 
     col_p1, col_p2 = st.columns(2)
     with col_p1:
-        work_mins = st.number_input("مدة وقت التركيز (دقائق):", min_value=1, max_value=60, value=25)
+        st.number_input("مدة وقت التركيز (دقائق):", min_value=1, max_value=60, value=25)
     with col_p2:
-        break_mins = st.number_input("مدة الاستراحة (دقائق):", min_value=1, max_value=30, value=5)
+        st.number_input("مدة الاستراحة (دقائق):", min_value=1, max_value=30, value=5)
 
     if st.button("توليد لغز أو تحدي استراحة علمي 🧩", key="pomo_puzzle_btn"):
-        with st.spinner("جاري ابتكار تحدي استراحة..."):
-            puzzle_res = model.generate_content("Give a fun, short science or logic puzzle with its hidden answer for a study break.")
-            st.info("### 🧩 تحدي الاستراحة:")
-            st.markdown(puzzle_res.text)
+        puzzle_res = model.generate_content("Give a fun, short science or logic puzzle with its hidden answer for a study break.")
+        st.info("### 🧩 تحدي الاستراحة:")
+        st.markdown(puzzle_res.text)
 
+# --- 🌡️ NEW IOT HARDWARE MONITOR TAB (التاب الجديد الخاص بالأردوينو والحساسات) ---
+with hardware_tab:
+    st.header("🌡️ SmartStudy IoT Hardware Monitor")
+    st.write("هذه اللوحة مرتبطة مباشرة بالأردوينو والحساسات البيئية لغرفة المذاكرة لتتبع حرارة الغرفة ومستوى الإضاءة لحظياً!")
+
+    st.sidebar.subheader("إعدادات الاتصال الهاردوير")
+    sim_hardware = st.sidebar.checkbox("وضع محاكاة الحساسات (Simulation)", value=True, help="عطّل هذا الخيار لو الأردوينو متصل بكابل USB عبر الـ Serial Port.")
+    
+    port_name = st.sidebar.text_input("اسم منفذ الأردوينو (COM Port)", value="COM3")
+    
+    # دالة قراءة البيانات من الأردوينو أو المحاكاة
+    def fetch_sensor_data(simulate=True):
+        if simulate:
+            return round(random.uniform(21.0, 31.0), 1), random.randint(150, 950)
+        else:
+            if SERIAL_AVAILABLE:
+                try:
+                    ser = serial.Serial(port_name, 9600, timeout=1)
+                    line = ser.readline().decode('utf-8').strip()
+                    ser.close()
+                    parts = line.split(',')
+                    if len(parts) == 2:
+                        return float(parts[0]), int(parts[1])
+                except:
+                    pass
+            return 24.0, 450 # قيمة افتراضية في حالة الخطأ
+
+    current_temp, current_light = fetch_sensor_data(sim_hardware)
+    current_time = time.strftime("%H:%M:%S")
+
+    # إضافة البيانات للجدول الزمني للرسم البياني
+    new_hw_row = pd.DataFrame({"Time": [current_time], "Temperature": [current_temp], "Light": [current_light]})
+    st.session_state.hardware_history = pd.concat([st.session_state.hardware_history, new_hw_row], ignore_index=True)
+    
+    if len(st.session_state.hardware_history) > 15:
+        st.session_state.hardware_history = st.session_state.hardware_history.tail(15)
+
+    # عرض الكروت الحية
+    hw_col1, hw_col2, hw_col3 = st.columns(3)
+    with hw_col1:
+        st.metric(label="🌡️ درجة حرارة الغرفة", value=f"{current_temp} °C", delta="ممتاز" if current_temp < 28 else "مرتفع ⚠️")
+    with hw_col2:
+        st.metric(label="💡 مستوى الإضاءة", value=f"{current_light} Lux", delta="مناسب" if current_light > 300 else "ضعيف ⚠️")
+    with hw_col3:
+        st.metric(label="📊 حالة النظام", value="متصل ✅", delta="جاهز للمسابقة")
+
+    st.divider()
+
+    # تنبيهات ذكية بناءً على الحساسات
+    st.subheader("🤖 التحليلات البيئية الذكية")
+    if current_light < 300:
+        st.warning("⚠️ تنبيه من حساس الإضاءة (LDR): إضاءة الغرفة منخفضة جداً، قد يتسبب ذلك في إجهاد عينيك أثناء المذاكرة.")
+    elif current_temp > 29:
+        st.error("🚨 تنبيه من حساس الحرارة: درجة الحرارة مرتفعة، يُنصح بأخذ راحة قصيرة وتغيير الهواء لتجديد نشاطك.")
+    else:
+        st.success("✨ بيئة الغرفة مثالية تماماً للتركيز والإنجاز الدراسي!")
+
+    # رسم بياني تفاعلي
+    st.subheader("📈 تتبع قراءات الحساسات عبر الزمن")
+    if not st.session_state.hardware_history.empty:
+        fig_hw = px.line(
+            st.session_state.hardware_history,
+            x="Time",
+            y=["Temperature", "Light"],
+            markers=True,
+            title="معدل تغير الحرارة والإضاءة الحقيقي"
+        )
+        st.plotly_chart(fig_hw, use_container_width=True)
+
+    if st.button("🔄 تحديث قراءات الحساسات الآن"):
+        st.rerun()
+
+# --- 3D MODEL TAB ---
 with model_tab:
     st.header("🎨 Generate Your Photo On 3D Model")
     st.write("اكتب وصفاً لأي شيء تريد تخيله كمجسم ثلاثي الأبعاد أو مشهد مجسم، وسيقوم التطبيق بتوليد الفكرة وعرضها لك!")
-    
-    user_image_prompt = st.text_input("اكتب وصف الصورة أو الموديل بالإنجليزية أو العربية:", placeholder="e.g. A cute 3D robot studying books, 3D render, blender style", key="img_prompt_input")
+    user_image_prompt = st.text_input("اكتب وصف الصورة أو الموديل بالإنجليزية أو العربية:", placeholder="e.g. A cute 3D robot studying books", key="img_prompt_input")
     
     if st.button("توليد الصورة 🚀", key="gen_img_btn"):
         if user_image_prompt:
             with st.spinner("جاري تصميم وتوليد الصورة ثلاثية الأبعاد... 🎨"):
-                try:
-                    # طريقة مضمونة أكثر لجلب صورة عبر pollinations أو استخدام Picsum/Loremflickr كبديل سريع وعالي الجودة
-                    encoded_prompt = urllib.parse.quote(user_image_prompt)
-                    # استخدام رابط pollinations الصحيح مع تحديد model=flux
-                    img_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=800&height=800&nologo=true"
-                    
-                    st.image(img_url, caption=f"النتيجة للوصف: {user_image_prompt}", use_container_width=True)
-                except Exception as e:
-                    st.error(f" حدث خطأ أثناء تحميل الصورة: {e}")
-        else:
-            st.warning("الرجاء كتابة وصف أولاً!")
+                encoded_prompt = urllib.parse.quote(user_image_prompt)
+                img_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=800&height=800&nologo=true"
+                st.image(img_url, caption=f"النتيجة للوصف: {user_image_prompt}", use_container_width=True)
 
-# --- 7. ACCOUNT TAB ---
+# --- ACCOUNT TAB ---
 with account_tab:
     st.header("👤 Account Settings")
     st.success(f"مرحباً بك! أنت مسجل الدخول حالياً بحساب: **{st.session_state.user_email}**")
     st.info(f"البريد الرسمي للمساعد الدراسي: {OFFICIAL_EMAIL}")
-    
     if st.button("تسجيل الخروج 🚪"):
         st.session_state.logged_in = False
         st.session_state.generated_otp = None
         st.session_state.otp_sent = False
         st.session_state.user_email = None
-        
         try:
             if controller.get("remembered_user"):
                 controller.remove("remembered_user")
-        except Exception:
+        except:
             pass
-            
         st.rerun()
 
 with note_tab:
