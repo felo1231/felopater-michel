@@ -194,8 +194,8 @@ if not st.session_state.logged_in:
 
 
 # --- APP TABS (أضفنا تاب جديد للـ Hardware) ---
-questions_tab, quizzes_tab, planner_tab, flashcards_tab, cheatsheet_tab, pomodoro_tab, hardware_tab, model_tab, account_tab, note_tab, music_tab = st.tabs(
-    ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅', 'Flashcards🗂️','Cheat-Sheet 📄', 'Pomodoro ⏱️', 'IoT Hardware 🌡️', 'Models 🎨', 'Account 👤', 'Important Notes 📌', 'Music 🎵']
+questions_tab, quizzes_tab, planner_tab, flashcards_tab, cheatsheet_tab, pomodoro_tab, hardware_tab, model_tab, music_tab, account_tab, note_tab,  = st.tabs(
+    ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅', 'Flashcards🗂️','Cheat-Sheet 📄', 'Pomodoro ⏱️', 'IoT Hardware 🌡️', 'Models 🎨', 'Music 🎵', 'Account 👤', 'Important Notes 📌']
 )
 
 # --- 4. QUESTIONS TAB ---
@@ -551,31 +551,6 @@ with model_tab:
                 img_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=800&height=800&nologo=true"
                 st.image(img_url, caption=f"النتيجة للوصف: {user_image_prompt}", use_container_width=True)
 
-# --- ACCOUNT TAB ---
-with account_tab:
-    st.header("👤 Account Settings")
-    st.success(f"مرحباً بك! أنت مسجل الدخول حالياً بحساب: **{st.session_state.user_email}**")
-    st.info(f"البريد الرسمي للمساعد الدراسي: {OFFICIAL_EMAIL}")
-    if st.button("تسجيل الخروج 🚪"):
-        st.session_state.logged_in = False
-        st.session_state.generated_otp = None
-        st.session_state.otp_sent = False
-        st.session_state.user_email = None
-        try:
-            if controller.get("remembered_user"):
-                controller.remove("remembered_user")
-        except:
-            pass
-        st.rerun()
-
-with note_tab:
-    st.header("📝 Treasure Notes")
-    st.write("نقاط و معلومات يجب أن تعلمها!!")
-    st.write("                                                                ")
-    st.write("This is A Good Website to see All Informations and Books (Egyptian Knowledge Bank)")
-    st.info("https://www.ekb.eg/ar/home")
-
-
 with music_tab:
     st.header("A beautiful music to hear it at studying")
     st.write("Sunset Landscape by Keys of Moon | https://soundcloud.com/keysofmoon Music promoted by https://www.chosic.com/free-music/all/Creative Commons CC BY 4.0https://creativecommons.org/licenses/by/4.0/")
@@ -606,3 +581,29 @@ with music_tab:
     audio_file = open("musics/Transcendence-chosic.com_.mp3", "rb")
     audio_bytes = audio_file.read()
     st.audio(audio_bytes, format='audio/mp3', autoplay=False)
+
+# --- ACCOUNT TAB ---
+with account_tab:
+    st.header("👤 Account Settings")
+    st.success(f"مرحباً بك! أنت مسجل الدخول حالياً بحساب: **{st.session_state.user_email}**")
+    st.info(f"البريد الرسمي للمساعد الدراسي: {OFFICIAL_EMAIL}")
+    if st.button("تسجيل الخروج 🚪"):
+        st.session_state.logged_in = False
+        st.session_state.generated_otp = None
+        st.session_state.otp_sent = False
+        st.session_state.user_email = None
+        try:
+            if controller.get("remembered_user"):
+                controller.remove("remembered_user")
+        except:
+            pass
+        st.rerun()
+
+with note_tab:
+    st.header("📝 Treasure Notes")
+    st.write("نقاط و معلومات يجب أن تعلمها!!")
+    st.write("                                                                ")
+    st.write("This is A Good Website to see All Informations and Books (Egyptian Knowledge Bank)")
+    st.info("https://www.ekb.eg/ar/home")
+
+
