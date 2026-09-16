@@ -194,8 +194,8 @@ if not st.session_state.logged_in:
 
 
 # --- APP TABS (أضفنا تاب جديد للـ Hardware) ---
-questions_tab, quizzes_tab, planner_tab, flashcards_tab, cheatsheet_tab, pomodoro_tab, hardware_tab, model_tab, account_tab, note_tab = st.tabs(
-    ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅', 'Flashcards🗂️','Cheat-Sheet 📄', 'Pomodoro ⏱️', 'IoT Hardware 🌡️', 'Models 🎨', 'Account 👤', 'Important Notes 📌']
+questions_tab, quizzes_tab, planner_tab, flashcards_tab, cheatsheet_tab, pomodoro_tab, hardware_tab, model_tab, account_tab, note_tab, music_tab = st.tabs(
+    ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅', 'Flashcards🗂️','Cheat-Sheet 📄', 'Pomodoro ⏱️', 'IoT Hardware 🌡️', 'Models 🎨', 'Account 👤', 'Important Notes 📌', 'Music 🎵']
 )
 
 # --- 4. QUESTIONS TAB ---
@@ -308,7 +308,7 @@ with quizzes_tab:
                 st.write(q_item["question"])
                 st.session_state.user_answers[i] = st.radio(
                     "Select an option:",
-                    options=q_item["options"],
+                    options=q_item["select a option from four options"],
                     key=f"quiz_q_{i}_{st.session_state.quiz_index}"
                 )
 
@@ -553,3 +553,6 @@ with note_tab:
     st.write("                                                                ")
     st.write("This is A Good Website to see All Informations and Books (Egyptian Knowledge Bank)")
     st.info("https://www.ekb.eg/ar/home")
+
+with music_tab:
+    st.header("A beautiful music to hear it at studying")
