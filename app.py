@@ -308,7 +308,7 @@ with quizzes_tab:
                 st.write(q_item["question"])
                 st.session_state.user_answers[i] = st.radio(
                     "Select an option:",
-                    options=q_item["options"],
+                    options=q_item["choices"],
                     key=f"quiz_q_{i}_{st.session_state.quiz_index}"
                 )
 
