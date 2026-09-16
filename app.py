@@ -581,18 +581,28 @@ with music_tab:
     st.write("Sunset Landscape by Keys of Moon | https://soundcloud.com/keysofmoon Music promoted by https://www.chosic.com/free-music/all/Creative Commons CC BY 4.0https://creativecommons.org/licenses/by/4.0/")
     
     # تم تصحيح طريقة قراءة الملف وإضافة خاصية التشغيل التلقائي
+    st.subheader("Evening Improvisation with Ethera")
     audio_file = open("musics/Evening-Improvisation-with-Ethera(chosic.com).mp3", "rb")
     audio_bytes = audio_file.read()
     st.audio(audio_bytes, format='audio/mp3', autoplay=False)
+    st.write("                                                                        ")
+
     #2
+    st.subheader("Memories of Spring")
     audio_file = open("musics/Memories-of-Spring(chosic.com).mp3", "rb")
     audio_bytes = audio_file.read()
     st.audio(audio_bytes, format='audio/mp3', autoplay=False)
+    st.write("                                                                        ")
+
     #3
+    st.subheader("Sunset Landscape")
     audio_file = open("musics/Sunset-Landscape(chosic.com).mp3", "rb")
     audio_bytes = audio_file.read()
     st.audio(audio_bytes, format='audio/mp3', autoplay=False)
+    st.write("                                                                        ")
+
     #4
+    st.subheader("Transcendence")
     audio_file = open("musics/Transcendence-chosic.com_.mp3", "rb")
     audio_bytes = audio_file.read()
     st.audio(audio_bytes, format='audio/mp3', autoplay=False)
