@@ -380,6 +380,7 @@ with planner_tab:
             st.warning("Tell me what you want to learn!")
 
 # --- FLASHCARDS TAB ---
+# --- FLASHCARDS TAB ---
 class FlashcardItem(typing.TypedDict):
     front: str
     back: str
@@ -387,35 +388,41 @@ class FlashcardItem(typing.TypedDict):
 with flashcards_tab:
     st.header("AI Flashcards 🗂️")
     st.write("اكتب اسم الدرس أو المفهوم، وسيقوم الذكاء الاصطناعي بتوليد فلاش كاردز تفاعلية للمراجعة السريعة!")
-    fc_topic = st.text_input("أدخل موضوع الدرس أو المفاهيم:", placeholder="مثلاً: قوانين نيوتن أو أساسيات بايثون")
-    fc_count = st.slider("عدد الكروت:", 3, 10, 5)
+    fc_topic = st.text_input("أدخل موضوع الدرس أو المفاهيم:", placeholder="مثلاً: قوانين نيوتن أو أساسيات بايثون", key="fc_topic_input")
+    fc_count = st.slider("عدد الكروت:", 3, 10, 5, key="fc_count_slider")
 
-    if st.button("توليد الفلاش كاردز 🎴", key="gen_fc_btn"):
+    if st.button("Generate Flashcards🎴", key="gen_fc_btn_fixed"):
         if fc_topic:
             with st.spinner("جاري صياغة الفلاش كاردز..."):
                 fc_prompt = f"""
-                Generate {fc_count} study flashcards for the topic: {fc_topic}.
-                Return JSON list of objects with keys "front" (question/concept) and "back" (concise answer/definition).
+                Generate exactly {fc_count} study flashcards for the topic: {fc_topic}.
+                You must return ONLY a valid JSON list of objects, where each object has keys "front" (the question or concept) and "back" (the concise answer or definition). No extra text or markdown formatting outside JSON.
                 """
                 try:
-                    res = model.generate_content(
-                        fc_prompt,
-                        generation_config={
-                            "response_mime_type": "application/json",
-                            "response_schema": list[FlashcardItem],
-                        }
-                    )
-                    st.session_state.flashcards = json.loads(res.text)
-                    st.success("تم توليد البطاقات بنجاح!")
+                    res = model.generate_content(fc_prompt)
+                    # تنظيف الاستجابة واستخراج الـ JSON بشكل آمن
+                    clean_text = res.text.strip()
+                    if clean_text.startswith("```json"):
+                        clean_text = clean_text[7:]
+                    if clean_text.endswith("```"):
+                        clean_text = clean_text[:-3]
+                    
+                    st.session_state.flashcards = json.loads(clean_text.strip())
+                    st.success("تم توليد البطاقات بنجاح! 👇")
                 except Exception as e:
-                    st.error(f"خطأ: {e}")
+                    if "ResourceExhausted" in str(e) or "429" in str(e):
+                        st.warning("⚠️ لقد تجاوزت الحد المسموح من الطلبات في الدقيقة. يرجى الانتظار لمدة دقيقة والمحاولة مرة أخرى.")
+                    else:
+                        st.error(f"حدث خطأ أثناء توليد البطاقات: {e}")
+        else:
+            st.warning("الرجاء إدخال موضوع الدرس أولاً!")
 
     if "flashcards" in st.session_state and st.session_state.flashcards:
         st.divider()
         for idx, card in enumerate(st.session_state.flashcards):
-            with st.expander(f"بطاقة رقم {idx+1}: {card['front']}"):
-                st.markdown(f"الإجابة / المفهوم: **{card['back']}**")
-
+            if isinstance(card, dict) and "front" in card and "back" in card:
+                with st.expander(f"بطاقة رقم {idx+1}: {card['front']}"):
+                    st.markdown(f"الإجابة / المفهوم: **")
 # --- CHEAT-SHEET TAB ---
 with cheatsheet_tab:
     st.header("Smart Cheat-Sheet Generator 📄")
