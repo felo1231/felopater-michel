@@ -346,7 +346,7 @@ with quizzes_tab:
             elif percentage >= 80:
                 st.success("### 🚀 Outstanding Work!")
             elif percentage >= 60:
-                st.warning("### 📈 Great Progress!")
+                st.warning("### 📈 Good Progress!")
             elif percentage >= 40:
                 st.info("### 🧠 Brain Power Building!")
             else:
