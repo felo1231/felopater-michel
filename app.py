@@ -194,8 +194,8 @@ if not st.session_state.logged_in:
 
 
 # --- APP TABS (أضفنا تاب جديد للـ Hardware) ---
-questions_tab, quizzes_tab, planner_tab, flashcards_tab, cheatsheet_tab, pomodoro_tab, hardware_tab, model_tab, music_tab, account_tab, note_tab,  = st.tabs(
-    ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅', 'Flashcards🗂️','Cheat-Sheet 📄', 'Pomodoro ⏱️', 'IoT Hardware 🌡️', 'Models 🎨', 'Music 🎵', 'Account 👤', 'Important Notes 📌']
+questions_tab, quizzes_tab, planner_tab, flashcards_tab, cheatsheet_tab, pomodoro_tab, hardware_tab, model_tab, music_tab, account_tab, note_tab, sbscriptions_tab = st.tabs(
+    ['Q&A ⁉️', 'Quizzes 📃', 'Study Planner✅', 'Flashcards🗂️','Cheat-Sheet 📄', 'Pomodoro ⏱️', 'IoT Hardware 🌡️', 'Models 🎨', 'Music 🎵', 'Account 👤', 'Important Notes 📌', 'Subscriptions 💰']
 )
 
 # --- 4. QUESTIONS TAB ---
@@ -607,3 +607,55 @@ with note_tab:
     st.info("https://www.ekb.eg/ar/home")
 
 
+with subscriptions_tab:
+    st.header("💎 Choose Your Learning Tier & Subscriptions")
+    st.write("ارتقِ بمستواك الدراسي مع خططنا الاحترافية المصممة خصيصاً لتمنحك قوة فائقة في التحصيل والمذاكرة!")
+
+    # تقسيم العرض لثلاث أعمدة (باقات اشتراك شبه المواقع الأجنبية العالمية)
+    col_sub1, col_sub2, col_sub3 = st.columns(3)
+
+    with col_sub1:
+        st.markdown("### 🌱 Free Explorer")
+        st.markdown("**$0 / شهر**")
+        st.markdown("---")
+        st.markdown("✔️ الوصول للأسئلة الأساسية (Q&A)")
+        st.markdown("✔️ مؤقت البومودورو القياسي")
+        st.markdown("✔️ الاستماع للموسيقى الهادئة")
+        st.markdown("❌ الذكاء الاصطناعي المتقدم")
+        st.markdown("❌ تحليل حساسات الأردوينو الذكية")
+        
+        if st.button("باقتك الحالية 🟢", key="sub_free_btn"):
+            st.toast("أنت بالفعل تستخدم الباقة المجانية!")
+
+    with col_sub2:
+        st.markdown("### 🚀 Pro Scholar")
+        st.markdown("**$9.99 / شهر**")
+        st.markdown("---")
+        st.markdown("⭐ **كل مميزات الباقة المجانية**")
+        st.markdown("⭐ توليد اختبارات غير محدودة بالذكاء الاصطناعي")
+        st.markdown("⭐ فلاش كاردز تفاعلية ذكية متقدمة")
+        st.markdown("⭐ تتبع قراءات حساسات الأردوينو البيئية")
+        st.markdown("⭐ دعم فني أسرع وأولوية في الرد")
+        
+        if st.button("الترقية لـ Pro 💳", key="sub_pro_btn"):
+            st.balloons()
+            st.success("🎉 مبروك! تم توجيهك لبوابة الدفع الآمنة (Stripe / PayPal Simulation).")
+
+    with col_sub3:
+        st.markdown("### 👑 AI Mastermind VIP")
+        st.markdown("**$29.99 / شهر**")
+        st.markdown("---")
+        st.markdown("🔥 **الميزات الخيالية والكاملة للمنصة**")
+        st.markdown("🔥 مساعد شخصي AI مخصص لك طوال الوقت")
+        st.markdown("🔥 توليد موديلات ثلاثية الأبعاد غير محدودة")
+        st.markdown("🔥 جلسات توجيه ومخطط دراسي خارق (Study Planner VIP)")
+        st.markdown("🔥 شهادة اعتماد دولية من المنصة عند إنهاء المسارات")
+        
+        if st.button("اشترك في VIP 🔥", key="sub_vip_btn"):
+            st.snow()
+            st.success("💎 أهلاً بك في نادي النخبة! سيتم تفعيل حسابك كـ VIP فوراً.")
+
+    st.divider()
+    st.subheader("💳 طرق الدفع المقبولة بأمان تام:")
+    st.write("نحن ندعم أحدث وسائل الدفع العالمية المعتمدة لضمان أمان معاملاتك:")
+    st.info("💳 Credit / Debit Cards (Visa, MasterCard)  |  🅿️ PayPal  |  🍏 Apple Pay  |  💎 Google Pay")
