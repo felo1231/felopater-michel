@@ -422,7 +422,15 @@ with flashcards_tab:
         for idx, card in enumerate(st.session_state.flashcards):
             if isinstance(card, dict) and "front" in card and "back" in card:
                 with st.expander(f"بطاقة رقم {idx+1}: {card['front']}"):
-                    st.markdown(f"الإجابة / المفهوم: **")
+                    st.markdown(f"الإجابة / المفهوم:")
+                c1, c2 = st.columns(2)
+                with c1:
+                    if st.button("فهمته جيداً ✅", key=f"know_{idx}"):
+                        st.toast("ممتاز! استمر في التقدم 🌟")
+                with c2:
+                    if st.button("أحتاج مراجعة 🔁", key=f"rev_{idx}"):
+                        st.toast("سجلنا أنك تحتاج مراجعتها لاحقاً 💪")
+
 # --- CHEAT-SHEET TAB ---
 with cheatsheet_tab:
     st.header("Smart Cheat-Sheet Generator 📄")
