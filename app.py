@@ -26,7 +26,7 @@ except ImportError:
 st.markdown("""
     <style>
     .stApp {
-        background: linear-gradient(-45deg, #2265bd, ##224ebd, #2241bd, #2232bd, #2235bd, #222abd, #2722bd, #3922bd) !important;
+        background: linear-gradient(-45deg, #2265bd, #224ebd, #2241bd, #2232bd, #2235bd, #222abd, #2722bd, #3922bd) !important;
         background-size: 400% 400%;
         animation: gradient 15s ease infinite;
     }
