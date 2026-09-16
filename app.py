@@ -264,14 +264,15 @@ with quizzes_tab:
         grade_level = st.selectbox(
             "Select your Grade/Level:",
             options=["Grade 1","Grade 2","Grade 3","Grade 4","Grade 5","Grade 6","Grade 7", "Grade 8", "Grade 9", "High School", "University"],
-            index=7
+            index=7,
+            key="quiz_grade_level_select"
         )
 
     with col_q2:
-        num_q = st.slider("Number of Questions:", 1, 20, 5)
-        difficulty = st.select_slider("Style:", options=["Basic", "mediam", "Challenge"])
+        num_q = st.slider("Number of Questions:", 1, 20, 5, key="quiz_num_slider")
+        difficulty = st.select_slider("Style:", options=["Basic", "mediam", "Challenge"], key="quiz_diff_slider")
 
-    if st.button("Generate My Quiz 📝"):
+    if st.button("Generate My Quiz 📝", key="gen_quiz_button_main"):
         if quiz_subject:
             with st.spinner(f'Creating a {grade_level} quiz...'):
                 quiz_prompt = f"""
@@ -293,24 +294,28 @@ with quizzes_tab:
                     st.success("تم صياغة الاختبار بنجاح! حل الأسئلة بالأسفل 👇")
                     
                 except Exception as e:
-                    if "quota" in str(e).lower() or "429" in str(e):
+                    if "quota" in str(e).lower() or "429" in str(e) or "ResourceExhausted" in str(e):
                         st.warning("⚠️ لقد قمت بإرسال طلبات كثيرة في وقت قصير. يرجى الانتظار لمدة دقيقة ثم المحاولة مرة أخرى.")
                     else:
-                        st.error("الخادم مشغول حالياً، يرجى إعادة الضغط على زر التوليد مرة أخرى.")
+                        st.error(f"حدث خطأ أثناء التوليد: {e}")
         else:
             st.warning("Please enter a subject first!")
 
-    if "quiz_data" in st.session_state:
+    if "quiz_data" in st.session_state and st.session_state.quiz_data:
         st.divider()
         with st.form("quiz_form"):
             for i, q_item in enumerate(st.session_state.quiz_data):
                 st.subheader(f"Question {i+1}")
-                st.write(q_item["question"])
-                st.session_state.user_answers[i] = st.radio(
-                    "Select an option:",
-                    options=q_item["options"],
-                    key=f"quiz_q_{i}_{st.session_state.quiz_index}"
-                )
+                # التأكد من وجود المفاتيح لمنع أي KeyError مستقبلية
+                if isinstance(q_item, dict) and "question" in q_item and "options" in q_item:
+                    st.write(q_item["question"])
+                    st.session_state.user_answers[i] = st.radio(
+                        "Select an option:",
+                        options=q_item["options"],
+                        key=f"quiz_q_{i}_{st.session_state.quiz_index}"
+                    )
+                else:
+                    st.error(" بيانات السؤال غير صالحة، يرجى إعادة توليد الاختبار.")
 
             submit_quiz = st.form_submit_button("Submit Answers ✅")
 
@@ -320,16 +325,17 @@ with quizzes_tab:
             st.divider()
 
             for i, q_item in enumerate(st.session_state.quiz_data):
-                user_choice = st.session_state.user_answers[i]
-                if user_choice == q_item["answer"]:
-                    st.success(f"Question {i+1}: Correct! 🌟")
-                    score += 1
-                else:
-                    st.error(f"Question {i+1}: Not quite.")
-                    st.info(f"The right answer was: **{q_item['answer']}**")
+                if isinstance(q_item, dict) and "answer" in q_item:
+                    user_choice = st.session_state.user_answers.get(i)
+                    if user_choice == q_item["answer"]:
+                        st.success(f"Question {i+1}: Correct! 🌟")
+                        score += 1
+                    else:
+                        st.error(f"Question {i+1}: Not quite.")
+                        st.info(f"The right answer was: **{q_item['answer']}**")
 
             total_questions = len(st.session_state.quiz_data)
-            percentage = (score / total_questions) * 100
+            percentage = (score / total_questions) * 100 if total_questions > 0 else 0
 
             st.header("Your Performance Report 📊")
             col_res1, col_res2 = st.columns(2)
