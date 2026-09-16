@@ -607,7 +607,7 @@ with note_tab:
     st.info("https://www.ekb.eg/ar/home")
 
 
-with subscriptions_tab:
+with sbscriptions_tab:
     st.header("💎 Choose Your Learning Tier & Subscriptions")
     st.write("ارتقِ بمستواك الدراسي مع خططنا الاحترافية المصممة خصيصاً لتمنحك قوة فائقة في التحصيل والمذاكرة!")
 
