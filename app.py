@@ -78,8 +78,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- APP CONFIG & SETUP ---
-st.set_page_config(page_title="AI Study Assistant", layout="wide")
-st.title('AI Studying Assistant✨')
+st.set_page_config(page_title="EduFlow app", layout="wide")
+st.title('EduFlow App📚')
 
 # --- GEMINI SETUP ---
 try:
