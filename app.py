@@ -581,6 +581,6 @@ with music_tab:
     st.write("Sunset Landscape by Keys of Moon | https://soundcloud.com/keysofmoon Music promoted by https://www.chosic.com/free-music/all/Creative Commons CC BY 4.0https://creativecommons.org/licenses/by/4.0/")
     
     # تم تصحيح طريقة قراءة الملف وإضافة خاصية التشغيل التلقائي
-    audio_file = open("audio_sample.ogg", "rb")
+    audio_file = open("musics", "rb")
     audio_bytes = audio_file.read()
     st.audio(audio_bytes, format='audio/ogg', autoplay=True)
