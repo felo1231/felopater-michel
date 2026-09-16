@@ -575,5 +575,12 @@ with note_tab:
     st.write("This is A Good Website to see All Informations and Books (Egyptian Knowledge Bank)")
     st.info("https://www.ekb.eg/ar/home")
 
+
 with music_tab:
     st.header("A beautiful music to hear it at studying")
+    st.write("Sunset Landscape by Keys of Moon | https://soundcloud.com/keysofmoon Music promoted by https://www.chosic.com/free-music/all/Creative Commons CC BY 4.0https://creativecommons.org/licenses/by/4.0/")
+    
+    # تم تصحيح طريقة قراءة الملف وإضافة خاصية التشغيل التلقائي
+    audio_file = open("audio_sample.ogg", "rb")
+    audio_bytes = audio_file.read()
+    st.audio(audio_bytes, format='audio/ogg', autoplay=True)
